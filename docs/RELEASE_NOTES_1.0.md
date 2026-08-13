@@ -13,7 +13,8 @@ registered-v1.1 MS-DOS game *Hocus Pocus*.
   attract demos, VOC effects, MIDI music, and joystick support
 - Optional 125 Hz interpolated High FPS mode
 - Borderless fullscreen with Alt+Enter
-- Ctrl+Alt+F1 persistent cheat menu, including Jump in Mid-Air
+- Ctrl+Alt+F1 persistent cheat menu, including Jump in Mid-Air and a selector
+  for all 36 chapter/stage combinations
 - Static C/C++ runtime linkage; locally built executables require no runtime
   library installation
 - Exhaustive registered-v1.1 disassembly and behavioral parity ledger

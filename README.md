@@ -77,9 +77,12 @@ During a level, Ctrl+Alt+F1 opens a paused cheat menu containing
 all four cheats recovered from the registered game: FEELGOOD invincibility,
 BLAKE infinite keys, QUARK permanent rapid fire, and BANANA infinite laser
 shots. It also provides the native `JUMP IN MID-AIR` toggle; press and release
-Jump again while airborne to start another jump. Use Up/Down or 1-5 to select,
-Enter or Space to toggle, and Escape or Ctrl+Alt+F1 to close it. The original
-typed cheat codes remain available as one-shot effects.
+Jump again while airborne to start another jump. While enabled, the camera
+tracks Hocus vertically during the full airborne arc. The sixth menu item opens
+a Chapter/Stage selector that can warp directly to any level from E1L1 through
+E4L9. Use Up/Down or 1-6 to select, Enter or Space to activate, and Escape or
+Ctrl+Alt+F1 to close it. The original typed cheat codes remain available as
+one-shot effects.
 The main menu's `HIGH FPS MODE` option (shortcut `F`) adds up to 125 interpolated presentation
 frames per second while retaining the selected original fixed-step game speed;
 it changes visual smoothness only, not physics, enemy logic, timers, or demos.

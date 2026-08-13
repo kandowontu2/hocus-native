@@ -212,8 +212,14 @@ inside a bounded jump table are listed with their owning dispatcher.
   `HOCUS_NATIVE.CFG` without consuming opaque bytes in DOS `HOCUS.SAV`.
 - `JUMP IN MID-AIR` is an explicit native cheat-menu addition. Each new Jump
   press while airborne restarts the normal jump arc; release-edge gating keeps
-  a held key from restarting that arc every fixed update. It is disabled by
-  default and does not alter the registered jump path when off.
+  a held key from restarting that arc every fixed update. While enabled, it
+  also lifts the registered CF0C vertical-camera freeze during the jump table,
+  allowing the unchanged incremental camera follower to track chained jumps
+  both upward and downward. It is disabled by default and does not alter the
+  registered jump or camera paths when off.
+- `CHAPTER/STAGE SELECT` is an explicit native cheat-menu addition. It can load
+  any of the registered game's 36 levels while retaining the current campaign
+  score; it is not presented as a recovered DOS code path.
 
 Subject to those explicit native-port boundaries, no unresolved registered
 game path or unclassified transfer remains in the audit.

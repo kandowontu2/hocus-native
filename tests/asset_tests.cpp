@@ -1260,6 +1260,34 @@ int main(int argc, char** argv) {
             std::cerr << "mid-air jump edge handling mismatch\n";
             return 1;
         }
+        // The native mid-air extension must also lift the DOS jump-lifetime
+        // camera freeze. Otherwise chained jumps can leave Hocus outside the
+        // viewport and make a later landing place him inside unseen floors.
+        hocus::GameLevel midair_camera(archive);
+        midair_camera.place_player(106, 36 * 16);
+        midair_camera.set_cheat_enabled(
+            hocus::CheatCode::midair_jump, true);
+        const int camera_before_jump = midair_camera.render().camera_pixel_y;
+        midair_camera.tick({false, false, true});
+        midair_camera.tick({});
+        const int camera_during_ascent =
+            midair_camera.render().camera_pixel_y;
+        bool camera_followed_descent_while_jumping = false;
+        int preceding_camera_y = camera_during_ascent;
+        for (int tick = 0; tick < 17; ++tick) {
+            midair_camera.tick({});
+            const int camera_y = midair_camera.render().camera_pixel_y;
+            if (midair_camera.player().jumping &&
+                camera_y > preceding_camera_y) {
+                camera_followed_descent_while_jumping = true;
+            }
+            preceding_camera_y = camera_y;
+        }
+        if (camera_during_ascent >= camera_before_jump ||
+            !camera_followed_descent_while_jumping) {
+            std::cerr << "mid-air jump camera tracking mismatch\n";
+            return 1;
+        }
         hocus::GameLevel traversal(archive);
         for (int tick = 0; tick < 100; ++tick) {
             traversal.tick({false, true, false});

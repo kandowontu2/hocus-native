@@ -87,6 +87,7 @@ enum class FrontendScreen {
     game_paused,
     game_notice,
     cheat_menu,
+    cheat_level_select,
     quit_confirmation,
     pause_menu,
     save_menu,
@@ -110,6 +111,9 @@ int g_save_slot_selection{};
 int g_restore_slot_selection{};
 int g_options_selection{};
 int g_cheat_selection{};
+int g_cheat_level_selection{};
+int g_cheat_episode{1};
+int g_cheat_level{1};
 int g_volume_selection{};
 int g_key_selection{};
 int g_menu_cursor_ticks{};
@@ -1359,13 +1363,14 @@ void resume_level(HWND window) {
 
 std::vector<std::string> cheat_menu_lines() {
     std::vector<std::string> lines;
-    lines.reserve(cheat_menu_labels.size() + 1);
+    lines.reserve(cheat_menu_labels.size() + 2);
     lines.emplace_back("Ctrl+Alt+F1 Cheat Menu");
     for (std::size_t index = 0; index < cheat_menu_labels.size(); ++index) {
         auto line = std::string(cheat_menu_labels[index]);
         line += g_cheat_toggles[index] ? " [ON]" : " [OFF]";
         lines.push_back(std::move(line));
     }
+    lines.emplace_back("CHAPTER/STAGE SELECT - Warp to any level");
     return lines;
 }
 
@@ -1375,7 +1380,7 @@ hocus::DecodedImage compose_cheat_menu() {
         g_menu_logo, g_bottom, g_menu_cursor_sheet, g_font_mask,
         g_game_palette, lines, true,
         g_cheat_selection, 0,
-        "UP/DOWN/1-5 move - ENTER toggle - ESC close").image;
+        "UP/DOWN/1-6 move - ENTER select - ESC close").image;
     if (g_dos_menu_stars.initialized()) {
         g_dos_menu_stars.draw(image);
     }
@@ -1407,7 +1412,68 @@ void close_cheat_menu(HWND window) {
     }
 }
 
+std::vector<std::string> cheat_level_select_lines() {
+    return {
+        "Chapter / Stage Select",
+        "CHAPTER: " + std::to_string(g_cheat_episode),
+        "STAGE: " + std::to_string(g_cheat_level),
+        "WARP TO E" + std::to_string(g_cheat_episode) + "L" +
+            std::to_string(g_cheat_level),
+    };
+}
+
+void render_cheat_level_select(HWND window) {
+    const auto lines = cheat_level_select_lines();
+    g_frame = hocus::render_dos_menu(
+        g_menu_logo, g_bottom, g_menu_cursor_sheet, g_font_mask,
+        g_game_palette, lines, true, g_cheat_level_selection, 0,
+        "ARROWS change - ENTER select - ESC back").image;
+    if (g_dos_menu_stars.initialized()) {
+        g_dos_menu_stars.draw(g_frame);
+    }
+    InvalidateRect(window, nullptr, FALSE);
+}
+
+void show_cheat_level_select(HWND window) {
+    g_cheat_episode = g_selected_level.episode;
+    g_cheat_level = g_selected_level.number;
+    g_cheat_level_selection = 0;
+    g_frontend_screen = FrontendScreen::cheat_level_select;
+    SetWindowTextW(window, L"Hocus Native - Chapter / Stage Select");
+    render_cheat_level_select(window);
+}
+
+void return_to_cheat_menu(HWND window) {
+    g_frontend_screen = FrontendScreen::cheat_menu;
+    SetWindowTextW(window, L"Hocus Native - Cheat Menu");
+    render_cheat_menu(window);
+}
+
+void change_cheat_level_value(HWND window, const int direction) {
+    if (g_cheat_level_selection == 0) {
+        g_cheat_episode =
+            (g_cheat_episode - 1 + direction + 4) % 4 + 1;
+    } else if (g_cheat_level_selection == 1) {
+        g_cheat_level = (g_cheat_level - 1 + direction + 9) % 9 + 1;
+    }
+    render_cheat_level_select(window);
+}
+
+void warp_to_cheat_level(HWND window) {
+    // A cheat warp starts a fresh level but keeps points already earned in
+    // the current run, rather than reverting to the entry score cached for
+    // Restart Level.
+    g_campaign_score = g_game->progress().score;
+    g_selected_level = {g_cheat_episode, g_cheat_level};
+    load_selected_level();
+    resume_level(window);
+}
+
 void toggle_selected_cheat(HWND window) {
+    if (g_cheat_selection == static_cast<int>(hocus::cheat_code_count)) {
+        show_cheat_level_select(window);
+        return;
+    }
     const auto index = static_cast<std::size_t>(g_cheat_selection);
     g_cheat_toggles[index] = !g_cheat_toggles[index];
     g_game->set_cheat_enabled(cheat_codes[index], g_cheat_toggles[index]);
@@ -1416,7 +1482,8 @@ void toggle_selected_cheat(HWND window) {
 
 void toggle_cheat_menu(HWND window) {
     if (!g_show_level &&
-        g_frontend_screen == FrontendScreen::cheat_menu) {
+        (g_frontend_screen == FrontendScreen::cheat_menu ||
+         g_frontend_screen == FrontendScreen::cheat_level_select)) {
         close_cheat_menu(window);
     } else if (g_show_level && g_game && !g_demo_playing) {
         show_cheat_menu(window);
@@ -1752,6 +1819,7 @@ bool frontend_needs_joystick_poll() {
     case FrontendScreen::game_paused:
     case FrontendScreen::game_notice:
     case FrontendScreen::cheat_menu:
+    case FrontendScreen::cheat_level_select:
     case FrontendScreen::save_menu:
     case FrontendScreen::restore_menu:
     case FrontendScreen::volume_control:
@@ -2617,7 +2685,7 @@ LRESULT CALLBACK window_proc(HWND window, UINT message, WPARAM wparam,
                     close_cheat_menu(window);
                 } else if (wparam == VK_UP || wparam == VK_DOWN) {
                     constexpr int item_count =
-                        static_cast<int>(hocus::cheat_code_count);
+                        static_cast<int>(hocus::cheat_code_count) + 1;
                     g_cheat_selection =
                         (g_cheat_selection +
                          (wparam == VK_UP ? -1 : 1) + item_count) %
@@ -2626,14 +2694,39 @@ LRESULT CALLBACK window_proc(HWND window, UINT message, WPARAM wparam,
                 } else if (wparam == VK_RETURN || wparam == VK_SPACE) {
                     toggle_selected_cheat(window);
                 } else if (wparam >= '1' &&
-                           wparam < '1' + hocus::cheat_code_count) {
+                           wparam < '1' + hocus::cheat_code_count + 1) {
                     g_cheat_selection = static_cast<int>(wparam - '1');
                     toggle_selected_cheat(window);
                 } else if (wparam >= VK_NUMPAD1 &&
-                           wparam < VK_NUMPAD1 + hocus::cheat_code_count) {
+                           wparam < VK_NUMPAD1 + hocus::cheat_code_count + 1) {
                     g_cheat_selection =
                         static_cast<int>(wparam - VK_NUMPAD1);
                     toggle_selected_cheat(window);
+                }
+                return 0;
+            }
+            if (!g_show_level &&
+                g_frontend_screen == FrontendScreen::cheat_level_select) {
+                if (wparam == VK_ESCAPE) {
+                    return_to_cheat_menu(window);
+                } else if (wparam == VK_UP || wparam == VK_DOWN) {
+                    constexpr int item_count = 3;
+                    g_cheat_level_selection =
+                        (g_cheat_level_selection +
+                         (wparam == VK_UP ? -1 : 1) + item_count) %
+                        item_count;
+                    render_cheat_level_select(window);
+                } else if (wparam == VK_LEFT || wparam == VK_RIGHT) {
+                    if (g_cheat_level_selection < 2) {
+                        change_cheat_level_value(
+                            window, wparam == VK_LEFT ? -1 : 1);
+                    }
+                } else if (wparam == VK_RETURN || wparam == VK_SPACE) {
+                    if (g_cheat_level_selection == 2) {
+                        warp_to_cheat_level(window);
+                    } else {
+                        change_cheat_level_value(window, 1);
+                    }
                 }
                 return 0;
             }

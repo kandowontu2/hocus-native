@@ -611,8 +611,10 @@ void GameLevel::update_camera() {
     }
 
     // CF0C freezes vertical camera tracking for the recovered jump-table
-    // lifetime. Horizontal tracking continues during that interval.
-    if (!player_.jumping) {
+    // lifetime. Horizontal tracking continues during that interval. The
+    // native mid-air-jump extension deliberately lifts only this gate so a
+    // chained jump cannot carry Hocus beyond the vertically frozen viewport.
+    if (!player_.jumping || cheat_enabled(CheatCode::midair_jump)) {
         const int target_y = std::clamp(
             floor_div(player_.y_pixels, tile_size) - camera_focus_rows_,
             0, map_height - viewport_height / tile_size);
