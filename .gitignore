@@ -1,0 +1,28 @@
+/build/
+/build-*/
+/assets/
+/analysis/
+/.vs/
+*.user
+*.suo
+*.pdb
+*.pyc
+__pycache__/
+
+# Local DOSBox convenience files are not part of the native port.
+/dosbox-x.exe
+/dosbox-x.exe - Shortcut.lnk
+/dosbox-x.conf
+
+# Original commercial game files remain local and are not source artifacts.
+/__hpgrvs.exe
+/hocus.exe
+/hocus.dat
+/HOCUS.SAV
+/hocustr.exe
+/hp-help.exe
+/setup.exe
+/ultramid.exe
+/ultramid.ini
+/hocusg.bat
+/license.doc

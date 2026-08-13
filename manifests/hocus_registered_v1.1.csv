@@ -1,0 +1,653 @@
+index,offset,size,name,format,notes
+0,0,720,FONT.MSK,1bpp (monochrome) 8×720 image,"Main font, containing 90 8×8 glyphs"
+1,720,30949,APOGEE.PCX,PCX Format,
+2,31669,39081,TITLE.PCX,PCX Format,
+3,70750,3844,REGIST.IMG,Hocus Pocus Image Format,Registered Version only
+4,74594,73346,WARP.PCX,PCX Format,
+5,147940,2880,SINCOS.DAT,720 floats,Sine / Cosine values for all angles from 0 to 359 degrees
+6,150820,2000,RANDOM.DAT,1000 INT16LEs,Random number table
+7,152820,384,GAMEPAL.PAL,Hocus Pocus Palette Format,
+8,153204,384,MENUPAL.PAL,Hocus Pocus Palette Format,
+9,153588,5124,BOTTOM.IMG,Hocus Pocus Image Format,
+10,158712,12484,HOCUS.IMG,Hocus Pocus Image Format,
+11,171196,1348,HUDSTUFF.IMG,Hocus Pocus Image Format,
+12,172544,12804,NEW_HUD.IMG,Hocus Pocus Image Format,
+13,185348,12804,OLD_HUD.IMG,Hocus Pocus Image Format,
+14,198152,1924,BULLIT.IMG,Hocus Pocus Image Format,
+15,200076,420,VOL_BAR.IMG,Hocus Pocus Image Format,
+16,200496,14964,CRYSTAL.IMG,Hocus Pocus Image Format,
+17,215460,9403,PIRACY.PCX,PCX Format,Registered Version only
+18,224863,9380,DEMO1.DMO,Hocus Pocus Demo Format,
+19,234243,11474,DEMO2.DMO,Hocus Pocus Demo Format,
+20,245717,12932,DEMO3.DMO,Hocus Pocus Demo Format,
+21,258649,11420,DEMO4.DMO,Hocus Pocus Demo Format,
+22,270069,8408,DEMO5.DMO,Hocus Pocus Demo Format,
+23,278477,11729,CREDITS1.PCX,PCX Format,
+24,290206,9406,CREDITS2.PCX,PCX Format,
+25,299612,10962,HELP1_K.PCX,PCX Format,
+26,310574,11086,HELP1_J.PCX,PCX Format,
+27,321660,14470,HELP2.PCX,PCX Format,
+28,336130,10461,GRAVIS.PCX,PCX Format,v1.1 only
+29,346591,9199,HELP3.PCX,PCX Format,
+30,355790,39168,PREVIEW1.PCX,PCX Format,
+31,394958,38135,PREVIEW2.PCX,PCX Format,
+32,433093,46814,PREVIEW3.PCX,PCX Format,
+33,479907,36010,PREVIEW4.PCX,PCX Format,
+34,515917,46515,PREVIEW5.PCX,PCX Format,
+35,562432,53374,PREVIEW6.PCX,PCX Format,
+36,615806,36861,PREVIEW7.PCX,PCX Format,
+37,652667,45998,PREVIEW8.PCX,PCX Format,
+38,698665,50472,PREVIEW9.PCX,PCX Format,
+39,749137,45009,PREVIEW11.PCX,PCX Format,
+40,794146,39457,PREVIEW12.PCX,PCX Format,
+41,833603,1686,ORDER_R1.PAG,Hocus Pocus Text Format,
+42,835289,1686,ORDER_R2.PAG,Hocus Pocus Text Format,
+43,836975,1686,ORDER1.PAG,Hocus Pocus Text Format,
+44,838661,1686,ORDER2.PAG,Hocus Pocus Text Format,
+45,840347,1686,ORDER3.PAG,Hocus Pocus Text Format,
+46,842033,1686,ORDER4.PAG,Hocus Pocus Text Format,
+47,843719,1686,ORDER5.PAG,Hocus Pocus Text Format,
+48,845405,1686,ORDER6.PAG,Hocus Pocus Text Format,
+49,847091,1686,ORDER7.PAG,Hocus Pocus Text Format,
+50,848777,1686,ORDER7+.PAG,Hocus Pocus Text Format,
+51,850463,1686,REGISTER.PAG,Hocus Pocus Text Format,
+52,852149,1686,STORY01.PAG,Hocus Pocus Text Format,
+53,853835,1686,STORY02.PAG,Hocus Pocus Text Format,
+54,855521,1686,STORY03.PAG,Hocus Pocus Text Format,
+55,857207,1686,STORY04.PAG,Hocus Pocus Text Format,
+56,858893,1686,STORY05.PAG,Hocus Pocus Text Format,
+57,860579,1686,STORY06.PAG,Hocus Pocus Text Format,
+58,862265,1686,STORY07.PAG,Hocus Pocus Text Format,
+59,863951,1686,STORY08.PAG,Hocus Pocus Text Format,
+60,865637,1686,STORY09.PAG,Hocus Pocus Text Format,
+61,867323,1686,STORY10.PAG,Hocus Pocus Text Format,
+62,869009,1686,E1END1.PAG,Hocus Pocus Text Format,
+63,870695,1686,E1END2.PAG,Hocus Pocus Text Format,
+64,872381,1686,E2END1.PAG,Hocus Pocus Text Format,Registered Version only
+65,874067,1686,E2END2.PAG,Hocus Pocus Text Format,Registered Version only
+66,875753,1686,E3END1.PAG,Hocus Pocus Text Format,Registered Version only
+67,877439,1686,E3END2.PAG,Hocus Pocus Text Format,Registered Version only
+68,879125,1686,E3END3.PAG,Hocus Pocus Text Format,Registered Version only
+69,880811,1686,E3END4.PAG,Hocus Pocus Text Format,Registered Version only
+70,882497,1686,E4END1.PAG,Hocus Pocus Text Format,Registered Version only
+71,884183,1686,E4END2.PAG,Hocus Pocus Text Format,Registered Version only
+72,885869,38203,KISS.PCX,PCX Format,Registered Version only
+73,924072,384,BACK01.PAL,Hocus Pocus Palette Format,
+74,924456,384,BACK02.PAL,Hocus Pocus Palette Format,
+75,924840,384,BACK03.PAL,Hocus Pocus Palette Format,
+76,925224,384,BACK04.PAL,Hocus Pocus Palette Format,
+77,925608,384,BACK05.PAL,Hocus Pocus Palette Format,Registered Version only
+78,925992,384,BACK06.PAL,Hocus Pocus Palette Format,Registered Version only
+79,926376,384,BACK07.PAL,Hocus Pocus Palette Format,Registered Version only
+80,926760,384,BACK08.PAL,Hocus Pocus Palette Format,Registered Version only
+81,927144,384,BACK09.PAL,Hocus Pocus Palette Format,Registered Version only
+82,927528,384,BACK10.PAL,Hocus Pocus Palette Format,Registered Version only
+83,927912,384,BACK11.PAL,Hocus Pocus Palette Format,Registered Version only
+84,928296,384,BACK12.PAL,Hocus Pocus Palette Format,Registered Version only
+85,928680,384,BACK13.PAL,Hocus Pocus Palette Format,Registered Version only
+86,929064,384,BACK14.PAL,Hocus Pocus Palette Format,Registered Version only
+87,929448,384,BACK15.PAL,Hocus Pocus Palette Format,Registered Version only
+88,929832,384,BACK16.PAL,Hocus Pocus Palette Format,Registered Version only
+89,930216,34000,BACK01.PCX,PCX Format,
+90,964216,48085,BACK02.PCX,PCX Format,
+91,1012301,33432,BACK03.PCX,PCX Format,
+92,1045733,45319,BACK04.PCX,PCX Format,
+93,1091052,33286,BACK05.PCX,PCX Format,Registered Version only
+94,1124338,50652,BACK06.PCX,PCX Format,Registered Version only
+95,1174990,38067,BACK07.PCX,PCX Format,Registered Version only
+96,1213057,59856,BACK08.PCX,PCX Format,Registered Version only
+97,1272913,32394,BACK09.PCX,PCX Format,Registered Version only
+98,1305307,28400,BACK10.PCX,PCX Format,Registered Version only
+99,1333707,43647,BACK11.PCX,PCX Format,Registered Version only
+100,1377354,46761,BACK12.PCX,PCX Format,Registered Version only
+101,1424115,32361,BACK13.PCX,PCX Format,Registered Version only
+102,1456476,47212,BACK14.PCX,PCX Format,Registered Version only
+103,1503688,35841,BACK15.PCX,PCX Format,Registered Version only
+104,1539529,59572,BACK16.PCX,PCX Format,Registered Version only
+105,1599101,24974,TILES01.PCX,PCX Format,
+106,1624075,28637,TILES02.PCX,PCX Format,
+107,1652712,30376,TILES03.PCX,PCX Format,
+108,1683088,20435,TILES04.PCX,PCX Format,
+109,1703523,22139,TILES05.PCX,PCX Format,Registered Version only
+110,1725662,24693,TILES06.PCX,PCX Format,Registered Version only
+111,1750355,26397,TILES07.PCX,PCX Format,Registered Version only
+112,1776752,25608,TILES08.PCX,PCX Format,Registered Version only
+113,1802360,22390,TILES09.PCX,PCX Format,Registered Version only
+114,1824750,20262,TILES10.PCX,PCX Format,Registered Version only
+115,1845012,25570,TILES11.PCX,PCX Format,Registered Version only
+116,1870582,23451,TILES12.PCX,PCX Format,Registered Version only
+117,1894033,24107,TILES13.PCX,PCX Format,Registered Version only
+118,1918140,26763,TILES14.PCX,PCX Format,Registered Version only
+119,1944903,23696,TILES15.PCX,PCX Format,Registered Version only
+120,1968599,21583,TILES16.PCX,PCX Format,Registered Version only
+121,1990182,15796,PIC1.IMG,Hocus Pocus Image Format,
+122,2005978,39249,WIN.PCX,PCX Format,
+123,2045227,22468,PIC2.IMG,Hocus Pocus Image Format,
+124,2067695,22468,PIC3.IMG,Hocus Pocus Image Format,
+125,2090163,15796,PIC4.IMG,Hocus Pocus Image Format,
+126,2105959,27652,PIC5.IMG,Hocus Pocus Image Format,
+127,2133611,22468,PIC6.IMG,Hocus Pocus Image Format,
+128,2156079,22468,PIC7.IMG,Hocus Pocus Image Format,
+129,2178547,28804,PIC8.IMG,Hocus Pocus Image Format,
+130,2207351,386965,SPRITES.SPR,Hocus Pocus Sprite Format,
+131,2594316,8,E1L1.000,Player Coordinates,
+132,2594324,8,E1L2.000,Player Coordinates,
+133,2594332,8,E1L3.000,Player Coordinates,
+134,2594340,8,E1L4.000,Player Coordinates,
+135,2594348,8,E1L5.000,Player Coordinates,
+136,2594356,8,E1L6.000,Player Coordinates,
+137,2594364,8,E1L7.000,Player Coordinates,
+138,2594372,8,E1L8.000,Player Coordinates,
+139,2594380,8,E1L9.000,Player Coordinates,
+140,2594388,8,E2L1.000,Player Coordinates,Registered Version only
+141,2594396,8,E2L2.000,Player Coordinates,Registered Version only
+142,2594404,8,E2L3.000,Player Coordinates,Registered Version only
+143,2594412,8,E2L4.000,Player Coordinates,Registered Version only
+144,2594420,8,E2L5.000,Player Coordinates,Registered Version only
+145,2594428,8,E2L6.000,Player Coordinates,Registered Version only
+146,2594436,8,E2L7.000,Player Coordinates,Registered Version only
+147,2594444,8,E2L8.000,Player Coordinates,Registered Version only
+148,2594452,8,E2L9.000,Player Coordinates,Registered Version only
+149,2594460,8,E3L1.000,Player Coordinates,Registered Version only
+150,2594468,8,E3L2.000,Player Coordinates,Registered Version only
+151,2594476,8,E3L3.000,Player Coordinates,Registered Version only
+152,2594484,8,E3L4.000,Player Coordinates,Registered Version only
+153,2594492,8,E3L5.000,Player Coordinates,Registered Version only
+154,2594500,8,E3L6.000,Player Coordinates,Registered Version only
+155,2594508,8,E3L7.000,Player Coordinates,Registered Version only
+156,2594516,8,E3L8.000,Player Coordinates,Registered Version only
+157,2594524,8,E3L9.000,Player Coordinates,Registered Version only
+158,2594532,8,E4L1.000,Player Coordinates,Registered Version only
+159,2594540,8,E4L2.000,Player Coordinates,Registered Version only
+160,2594548,8,E4L3.000,Player Coordinates,Registered Version only
+161,2594556,8,E4L4.000,Player Coordinates,Registered Version only
+162,2594564,8,E4L5.000,Player Coordinates,Registered Version only
+163,2594572,8,E4L6.000,Player Coordinates,Registered Version only
+164,2594580,8,E4L7.000,Player Coordinates,Registered Version only
+165,2594588,8,E4L8.000,Player Coordinates,Registered Version only
+166,2594596,8,E4L9.000,Player Coordinates,Registered Version only
+167,2594604,724,E1L1.001,Tile Animation Settings,
+168,2595328,724,E1L2.001,Tile Animation Settings,
+169,2596052,724,E1L3.001,Tile Animation Settings,
+170,2596776,724,E1L4.001,Tile Animation Settings,
+171,2597500,724,E1L5.001,Tile Animation Settings,
+172,2598224,724,E1L6.001,Tile Animation Settings,
+173,2598948,724,E1L7.001,Tile Animation Settings,
+174,2599672,724,E1L8.001,Tile Animation Settings,
+175,2600396,724,E1L9.001,Tile Animation Settings,
+176,2601120,724,E2L1.001,Tile Animation Settings,Registered Version only
+177,2601844,724,E2L2.001,Tile Animation Settings,Registered Version only
+178,2602568,724,E2L3.001,Tile Animation Settings,Registered Version only
+179,2603292,724,E2L4.001,Tile Animation Settings,Registered Version only
+180,2604016,724,E2L5.001,Tile Animation Settings,Registered Version only
+181,2604740,724,E2L6.001,Tile Animation Settings,Registered Version only
+182,2605464,724,E2L7.001,Tile Animation Settings,Registered Version only
+183,2606188,724,E2L8.001,Tile Animation Settings,Registered Version only
+184,2606912,724,E2L9.001,Tile Animation Settings,Registered Version only
+185,2607636,724,E3L1.001,Tile Animation Settings,Registered Version only
+186,2608360,724,E3L2.001,Tile Animation Settings,Registered Version only
+187,2609084,724,E3L3.001,Tile Animation Settings,Registered Version only
+188,2609808,724,E3L4.001,Tile Animation Settings,Registered Version only
+189,2610532,724,E3L5.001,Tile Animation Settings,Registered Version only
+190,2611256,724,E3L6.001,Tile Animation Settings,Registered Version only
+191,2611980,724,E3L7.001,Tile Animation Settings,Registered Version only
+192,2612704,724,E3L8.001,Tile Animation Settings,Registered Version only
+193,2613428,724,E3L9.001,Tile Animation Settings,Registered Version only
+194,2614152,724,E4L1.001,Tile Animation Settings,Registered Version only
+195,2614876,724,E4L2.001,Tile Animation Settings,Registered Version only
+196,2615600,724,E4L3.001,Tile Animation Settings,Registered Version only
+197,2616324,724,E4L4.001,Tile Animation Settings,Registered Version only
+198,2617048,724,E4L5.001,Tile Animation Settings,Registered Version only
+199,2617772,724,E4L6.001,Tile Animation Settings,Registered Version only
+200,2618496,724,E4L7.001,Tile Animation Settings,Registered Version only
+201,2619220,724,E4L8.001,Tile Animation Settings,Registered Version only
+202,2619944,724,E4L9.001,Tile Animation Settings,Registered Version only
+203,2620668,5040,E1L1.002,Message Texts,
+204,2625708,5040,E1L2.002,Message Texts,
+205,2630748,5040,E1L3.002,Message Texts,
+206,2635788,5040,E1L4.002,Message Texts,
+207,2640828,5040,E1L5.002,Message Texts,
+208,2645868,5040,E1L6.002,Message Texts,
+209,2650908,5040,E1L7.002,Message Texts,
+210,2655948,5040,E1L8.002,Message Texts,
+211,2660988,5040,E1L9.002,Message Texts,
+212,2666028,5040,E2L1.002,Message Texts,Registered Version only
+213,2671068,5040,E2L2.002,Message Texts,Registered Version only
+214,2676108,5040,E2L3.002,Message Texts,Registered Version only
+215,2681148,5040,E2L4.002,Message Texts,Registered Version only
+216,2686188,5040,E2L5.002,Message Texts,Registered Version only
+217,2691228,5040,E2L6.002,Message Texts,Registered Version only
+218,2696268,5040,E2L7.002,Message Texts,Registered Version only
+219,2701308,5040,E2L8.002,Message Texts,Registered Version only
+220,2706348,5040,E2L9.002,Message Texts,Registered Version only
+221,2711388,5040,E3L1.002,Message Texts,Registered Version only
+222,2716428,5040,E3L2.002,Message Texts,Registered Version only
+223,2721468,5040,E3L3.002,Message Texts,Registered Version only
+224,2726508,5040,E3L4.002,Message Texts,Registered Version only
+225,2731548,5040,E3L5.002,Message Texts,Registered Version only
+226,2736588,5040,E3L6.002,Message Texts,Registered Version only
+227,2741628,5040,E3L7.002,Message Texts,Registered Version only
+228,2746668,5040,E3L8.002,Message Texts,Registered Version only
+229,2751708,5040,E3L9.002,Message Texts,Registered Version only
+230,2756748,5040,E4L1.002,Message Texts,Registered Version only
+231,2761788,5040,E4L2.002,Message Texts,Registered Version only
+232,2766828,5040,E4L3.002,Message Texts,Registered Version only
+233,2771868,5040,E4L4.002,Message Texts,Registered Version only
+234,2776908,5040,E4L5.002,Message Texts,Registered Version only
+235,2781948,5040,E4L6.002,Message Texts,Registered Version only
+236,2786988,5040,E4L7.002,Message Texts,Registered Version only
+237,2792028,5040,E4L8.002,Message Texts,Registered Version only
+238,2797068,5040,E4L9.002,Message Texts,Registered Version only
+239,2802108,40,E1L1.003,Teleporter Coordinates,
+240,2802148,40,E1L2.003,Teleporter Coordinates,
+241,2802188,40,E1L3.003,Teleporter Coordinates,
+242,2802228,40,E1L4.003,Teleporter Coordinates,
+243,2802268,40,E1L5.003,Teleporter Coordinates,
+244,2802308,40,E1L6.003,Teleporter Coordinates,
+245,2802348,40,E1L7.003,Teleporter Coordinates,
+246,2802388,40,E1L8.003,Teleporter Coordinates,
+247,2802428,40,E1L9.003,Teleporter Coordinates,
+248,2802468,40,E2L1.003,Teleporter Coordinates,Registered Version only
+249,2802508,40,E2L2.003,Teleporter Coordinates,Registered Version only
+250,2802548,40,E2L3.003,Teleporter Coordinates,Registered Version only
+251,2802588,40,E2L4.003,Teleporter Coordinates,Registered Version only
+252,2802628,40,E2L5.003,Teleporter Coordinates,Registered Version only
+253,2802668,40,E2L6.003,Teleporter Coordinates,Registered Version only
+254,2802708,40,E2L7.003,Teleporter Coordinates,Registered Version only
+255,2802748,40,E2L8.003,Teleporter Coordinates,Registered Version only
+256,2802788,40,E2L9.003,Teleporter Coordinates,Registered Version only
+257,2802828,40,E3L1.003,Teleporter Coordinates,Registered Version only
+258,2802868,40,E3L2.003,Teleporter Coordinates,Registered Version only
+259,2802908,40,E3L3.003,Teleporter Coordinates,Registered Version only
+260,2802948,40,E3L4.003,Teleporter Coordinates,Registered Version only
+261,2802988,40,E3L5.003,Teleporter Coordinates,Registered Version only
+262,2803028,40,E3L6.003,Teleporter Coordinates,Registered Version only
+263,2803068,40,E3L7.003,Teleporter Coordinates,Registered Version only
+264,2803108,40,E3L8.003,Teleporter Coordinates,Registered Version only
+265,2803148,40,E3L9.003,Teleporter Coordinates,Registered Version only
+266,2803188,40,E4L1.003,Teleporter Coordinates,Registered Version only
+267,2803228,40,E4L2.003,Teleporter Coordinates,Registered Version only
+268,2803268,40,E4L3.003,Teleporter Coordinates,Registered Version only
+269,2803308,40,E4L4.003,Teleporter Coordinates,Registered Version only
+270,2803348,40,E4L5.003,Teleporter Coordinates,Registered Version only
+271,2803388,40,E4L6.003,Teleporter Coordinates,Registered Version only
+272,2803428,40,E4L7.003,Teleporter Coordinates,Registered Version only
+273,2803468,40,E4L8.003,Teleporter Coordinates,Registered Version only
+274,2803508,40,E4L9.003,Teleporter Coordinates,Registered Version only
+275,2803548,506,E1L1.004,Switch Coordinates,
+276,2804054,506,E1L2.004,Switch Coordinates,
+277,2804560,506,E1L3.004,Switch Coordinates,
+278,2805066,506,E1L4.004,Switch Coordinates,
+279,2805572,506,E1L5.004,Switch Coordinates,
+280,2806078,506,E1L6.004,Switch Coordinates,
+281,2806584,506,E1L7.004,Switch Coordinates,
+282,2807090,506,E1L8.004,Switch Coordinates,
+283,2807596,506,E1L9.004,Switch Coordinates,
+284,2808102,506,E2L1.004,Switch Coordinates,Registered Version only
+285,2808608,506,E2L2.004,Switch Coordinates,Registered Version only
+286,2809114,506,E2L3.004,Switch Coordinates,Registered Version only
+287,2809620,506,E2L4.004,Switch Coordinates,Registered Version only
+288,2810126,506,E2L5.004,Switch Coordinates,Registered Version only
+289,2810632,506,E2L6.004,Switch Coordinates,Registered Version only
+290,2811138,506,E2L7.004,Switch Coordinates,Registered Version only
+291,2811644,506,E2L8.004,Switch Coordinates,Registered Version only
+292,2812150,506,E2L9.004,Switch Coordinates,Registered Version only
+293,2812656,506,E3L1.004,Switch Coordinates,Registered Version only
+294,2813162,506,E3L2.004,Switch Coordinates,Registered Version only
+295,2813668,506,E3L3.004,Switch Coordinates,Registered Version only
+296,2814174,506,E3L4.004,Switch Coordinates,Registered Version only
+297,2814680,506,E3L5.004,Switch Coordinates,Registered Version only
+298,2815186,506,E3L6.004,Switch Coordinates,Registered Version only
+299,2815692,506,E3L7.004,Switch Coordinates,Registered Version only
+300,2816198,506,E3L8.004,Switch Coordinates,Registered Version only
+301,2816704,506,E3L9.004,Switch Coordinates,Registered Version only
+302,2817210,506,E4L1.004,Switch Coordinates,Registered Version only
+303,2817716,506,E4L2.004,Switch Coordinates,Registered Version only
+304,2818222,506,E4L3.004,Switch Coordinates,Registered Version only
+305,2818728,506,E4L4.004,Switch Coordinates,Registered Version only
+306,2819234,506,E4L5.004,Switch Coordinates,Registered Version only
+307,2819740,506,E4L6.004,Switch Coordinates,Registered Version only
+308,2820246,506,E4L7.004,Switch Coordinates,Registered Version only
+309,2820752,506,E4L8.004,Switch Coordinates,Registered Version only
+310,2821258,506,E4L9.004,Switch Coordinates,Registered Version only
+311,2821764,300,E1L1.005,Insert Data Coordinates,
+312,2822064,300,E1L2.005,Insert Data Coordinates,
+313,2822364,300,E1L3.005,Insert Data Coordinates,
+314,2822664,300,E1L4.005,Insert Data Coordinates,
+315,2822964,300,E1L5.005,Insert Data Coordinates,
+316,2823264,300,E1L6.005,Insert Data Coordinates,
+317,2823564,300,E1L7.005,Insert Data Coordinates,
+318,2823864,300,E1L8.005,Insert Data Coordinates,
+319,2824164,300,E1L9.005,Insert Data Coordinates,
+320,2824464,300,E2L1.005,Insert Data Coordinates,Registered Version only
+321,2824764,300,E2L2.005,Insert Data Coordinates,Registered Version only
+322,2825064,300,E2L3.005,Insert Data Coordinates,Registered Version only
+323,2825364,300,E2L4.005,Insert Data Coordinates,Registered Version only
+324,2825664,300,E2L5.005,Insert Data Coordinates,Registered Version only
+325,2825964,300,E2L6.005,Insert Data Coordinates,Registered Version only
+326,2826264,300,E2L7.005,Insert Data Coordinates,Registered Version only
+327,2826564,300,E2L8.005,Insert Data Coordinates,Registered Version only
+328,2826864,300,E2L9.005,Insert Data Coordinates,Registered Version only
+329,2827164,300,E3L1.005,Insert Data Coordinates,Registered Version only
+330,2827464,300,E3L2.005,Insert Data Coordinates,Registered Version only
+331,2827764,300,E3L3.005,Insert Data Coordinates,Registered Version only
+332,2828064,300,E3L4.005,Insert Data Coordinates,Registered Version only
+333,2828364,300,E3L5.005,Insert Data Coordinates,Registered Version only
+334,2828664,300,E3L6.005,Insert Data Coordinates,Registered Version only
+335,2828964,300,E3L7.005,Insert Data Coordinates,Registered Version only
+336,2829264,300,E3L8.005,Insert Data Coordinates,Registered Version only
+337,2829564,300,E3L9.005,Insert Data Coordinates,Registered Version only
+338,2829864,300,E4L1.005,Insert Data Coordinates,Registered Version only
+339,2830164,300,E4L2.005,Insert Data Coordinates,Registered Version only
+340,2830464,300,E4L3.005,Insert Data Coordinates,Registered Version only
+341,2830764,300,E4L4.005,Insert Data Coordinates,Registered Version only
+342,2831064,300,E4L5.005,Insert Data Coordinates,Registered Version only
+343,2831364,300,E4L6.005,Insert Data Coordinates,Registered Version only
+344,2831664,300,E4L7.005,Insert Data Coordinates,Registered Version only
+345,2831964,300,E4L8.005,Insert Data Coordinates,Registered Version only
+346,2832264,300,E4L9.005,Insert Data Coordinates,Registered Version only
+347,2832564,300,E1L1.006,Keyhole Coordinates,
+348,2832864,300,E1L2.006,Keyhole Coordinates,
+349,2833164,300,E1L3.006,Keyhole Coordinates,
+350,2833464,300,E1L4.006,Keyhole Coordinates,
+351,2833764,300,E1L5.006,Keyhole Coordinates,
+352,2834064,300,E1L6.006,Keyhole Coordinates,
+353,2834364,300,E1L7.006,Keyhole Coordinates,
+354,2834664,300,E1L8.006,Keyhole Coordinates,
+355,2834964,300,E1L9.006,Keyhole Coordinates,
+356,2835264,300,E2L1.006,Keyhole Coordinates,Registered Version only
+357,2835564,300,E2L2.006,Keyhole Coordinates,Registered Version only
+358,2835864,300,E2L3.006,Keyhole Coordinates,Registered Version only
+359,2836164,300,E2L4.006,Keyhole Coordinates,Registered Version only
+360,2836464,300,E2L5.006,Keyhole Coordinates,Registered Version only
+361,2836764,300,E2L6.006,Keyhole Coordinates,Registered Version only
+362,2837064,300,E2L7.006,Keyhole Coordinates,Registered Version only
+363,2837364,300,E2L8.006,Keyhole Coordinates,Registered Version only
+364,2837664,300,E2L9.006,Keyhole Coordinates,Registered Version only
+365,2837964,300,E3L1.006,Keyhole Coordinates,Registered Version only
+366,2838264,300,E3L2.006,Keyhole Coordinates,Registered Version only
+367,2838564,300,E3L3.006,Keyhole Coordinates,Registered Version only
+368,2838864,300,E3L4.006,Keyhole Coordinates,Registered Version only
+369,2839164,300,E3L5.006,Keyhole Coordinates,Registered Version only
+370,2839464,300,E3L6.006,Keyhole Coordinates,Registered Version only
+371,2839764,300,E3L7.006,Keyhole Coordinates,Registered Version only
+372,2840064,300,E3L8.006,Keyhole Coordinates,Registered Version only
+373,2840364,300,E3L9.006,Keyhole Coordinates,Registered Version only
+374,2840664,300,E4L1.006,Keyhole Coordinates,Registered Version only
+375,2840964,300,E4L2.006,Keyhole Coordinates,Registered Version only
+376,2841264,300,E4L3.006,Keyhole Coordinates,Registered Version only
+377,2841564,300,E4L4.006,Keyhole Coordinates,Registered Version only
+378,2841864,300,E4L5.006,Keyhole Coordinates,Registered Version only
+379,2842164,300,E4L6.006,Keyhole Coordinates,Registered Version only
+380,2842464,300,E4L7.006,Keyhole Coordinates,Registered Version only
+381,2842764,300,E4L8.006,Keyhole Coordinates,Registered Version only
+382,2843064,300,E4L9.006,Keyhole Coordinates,Registered Version only
+383,2843364,240,E1L1.007,Enemy Definitions,
+384,2843604,240,E1L2.007,Enemy Definitions,
+385,2843844,240,E1L3.007,Enemy Definitions,
+386,2844084,240,E1L4.007,Enemy Definitions,
+387,2844324,240,E1L5.007,Enemy Definitions,
+388,2844564,240,E1L6.007,Enemy Definitions,
+389,2844804,240,E1L7.007,Enemy Definitions,
+390,2845044,240,E1L8.007,Enemy Definitions,
+391,2845284,240,E1L9.007,Enemy Definitions,
+392,2845524,240,E2L1.007,Enemy Definitions,Registered Version only
+393,2845764,240,E2L2.007,Enemy Definitions,Registered Version only
+394,2846004,240,E2L3.007,Enemy Definitions,Registered Version only
+395,2846244,240,E2L4.007,Enemy Definitions,Registered Version only
+396,2846484,240,E2L5.007,Enemy Definitions,Registered Version only
+397,2846724,240,E2L6.007,Enemy Definitions,Registered Version only
+398,2846964,240,E2L7.007,Enemy Definitions,Registered Version only
+399,2847204,240,E2L8.007,Enemy Definitions,Registered Version only
+400,2847444,240,E2L9.007,Enemy Definitions,Registered Version only
+401,2847684,240,E3L1.007,Enemy Definitions,Registered Version only
+402,2847924,240,E3L2.007,Enemy Definitions,Registered Version only
+403,2848164,240,E3L3.007,Enemy Definitions,Registered Version only
+404,2848404,240,E3L4.007,Enemy Definitions,Registered Version only
+405,2848644,240,E3L5.007,Enemy Definitions,Registered Version only
+406,2848884,240,E3L6.007,Enemy Definitions,Registered Version only
+407,2849124,240,E3L7.007,Enemy Definitions,Registered Version only
+408,2849364,240,E3L8.007,Enemy Definitions,Registered Version only
+409,2849604,240,E3L9.007,Enemy Definitions,Registered Version only
+410,2849844,240,E4L1.007,Enemy Definitions,Registered Version only
+411,2850084,240,E4L2.007,Enemy Definitions,Registered Version only
+412,2850324,240,E4L3.007,Enemy Definitions,Registered Version only
+413,2850564,240,E4L4.007,Enemy Definitions,Registered Version only
+414,2850804,240,E4L5.007,Enemy Definitions,Registered Version only
+415,2851044,240,E4L6.007,Enemy Definitions,Registered Version only
+416,2851284,240,E4L7.007,Enemy Definitions,Registered Version only
+417,2851524,240,E4L8.007,Enemy Definitions,Registered Version only
+418,2851764,240,E4L9.007,Enemy Definitions,Registered Version only
+419,2852004,8000,E1L1.008,Enemy Trigger Table,
+420,2860004,8000,E1L2.008,Enemy Trigger Table,
+421,2868004,8000,E1L3.008,Enemy Trigger Table,
+422,2876004,8000,E1L4.008,Enemy Trigger Table,
+423,2884004,8000,E1L5.008,Enemy Trigger Table,
+424,2892004,8000,E1L6.008,Enemy Trigger Table,
+425,2900004,8000,E1L7.008,Enemy Trigger Table,
+426,2908004,8000,E1L8.008,Enemy Trigger Table,
+427,2916004,8000,E1L9.008,Enemy Trigger Table,
+428,2924004,8000,E2L1.008,Enemy Trigger Table,Registered Version only
+429,2932004,8000,E2L2.008,Enemy Trigger Table,Registered Version only
+430,2940004,8000,E2L3.008,Enemy Trigger Table,Registered Version only
+431,2948004,8000,E2L4.008,Enemy Trigger Table,Registered Version only
+432,2956004,8000,E2L5.008,Enemy Trigger Table,Registered Version only
+433,2964004,8000,E2L6.008,Enemy Trigger Table,Registered Version only
+434,2972004,8000,E2L7.008,Enemy Trigger Table,Registered Version only
+435,2980004,8000,E2L8.008,Enemy Trigger Table,Registered Version only
+436,2988004,8000,E2L9.008,Enemy Trigger Table,Registered Version only
+437,2996004,8000,E3L1.008,Enemy Trigger Table,Registered Version only
+438,3004004,8000,E3L2.008,Enemy Trigger Table,Registered Version only
+439,3012004,8000,E3L3.008,Enemy Trigger Table,Registered Version only
+440,3020004,8000,E3L4.008,Enemy Trigger Table,Registered Version only
+441,3028004,8000,E3L5.008,Enemy Trigger Table,Registered Version only
+442,3036004,8000,E3L6.008,Enemy Trigger Table,Registered Version only
+443,3044004,8000,E3L7.008,Enemy Trigger Table,Registered Version only
+444,3052004,8000,E3L8.008,Enemy Trigger Table,Registered Version only
+445,3060004,8000,E3L9.008,Enemy Trigger Table,Registered Version only
+446,3068004,8000,E4L1.008,Enemy Trigger Table,Registered Version only
+447,3076004,8000,E4L2.008,Enemy Trigger Table,Registered Version only
+448,3084004,8000,E4L3.008,Enemy Trigger Table,Registered Version only
+449,3092004,8000,E4L4.008,Enemy Trigger Table,Registered Version only
+450,3100004,8000,E4L5.008,Enemy Trigger Table,Registered Version only
+451,3108004,8000,E4L6.008,Enemy Trigger Table,Registered Version only
+452,3116004,8000,E4L7.008,Enemy Trigger Table,Registered Version only
+453,3124004,8000,E4L8.008,Enemy Trigger Table,Registered Version only
+454,3132004,8000,E4L9.008,Enemy Trigger Table,Registered Version only
+455,3140004,14400,E1L1.009,Background Layer,
+456,3154404,14400,E1L2.009,Background Layer,
+457,3168804,14400,E1L3.009,Background Layer,
+458,3183204,14400,E1L4.009,Background Layer,
+459,3197604,14400,E1L5.009,Background Layer,
+460,3212004,14400,E1L6.009,Background Layer,
+461,3226404,14400,E1L7.009,Background Layer,
+462,3240804,14400,E1L8.009,Background Layer,
+463,3255204,14400,E1L9.009,Background Layer,
+464,3269604,14400,E2L1.009,Background Layer,Registered Version only
+465,3284004,14400,E2L2.009,Background Layer,Registered Version only
+466,3298404,14400,E2L3.009,Background Layer,Registered Version only
+467,3312804,14400,E2L4.009,Background Layer,Registered Version only
+468,3327204,14400,E2L5.009,Background Layer,Registered Version only
+469,3341604,14400,E2L6.009,Background Layer,Registered Version only
+470,3356004,14400,E2L7.009,Background Layer,Registered Version only
+471,3370404,14400,E2L8.009,Background Layer,Registered Version only
+472,3384804,14400,E2L9.009,Background Layer,Registered Version only
+473,3399204,14400,E3L1.009,Background Layer,Registered Version only
+474,3413604,14400,E3L2.009,Background Layer,Registered Version only
+475,3428004,14400,E3L3.009,Background Layer,Registered Version only
+476,3442404,14400,E3L4.009,Background Layer,Registered Version only
+477,3456804,14400,E3L5.009,Background Layer,Registered Version only
+478,3471204,14400,E3L6.009,Background Layer,Registered Version only
+479,3485604,14400,E3L7.009,Background Layer,Registered Version only
+480,3500004,14400,E3L8.009,Background Layer,Registered Version only
+481,3514404,14400,E3L9.009,Background Layer,Registered Version only
+482,3528804,14400,E4L1.009,Background Layer,Registered Version only
+483,3543204,14400,E4L2.009,Background Layer,Registered Version only
+484,3557604,14400,E4L3.009,Background Layer,Registered Version only
+485,3572004,14400,E4L4.009,Background Layer,Registered Version only
+486,3586404,14400,E4L5.009,Background Layer,Registered Version only
+487,3600804,14400,E4L6.009,Background Layer,Registered Version only
+488,3615204,14400,E4L7.009,Background Layer,Registered Version only
+489,3629604,14400,E4L8.009,Background Layer,Registered Version only
+490,3644004,14400,E4L9.009,Background Layer,Registered Version only
+491,3658404,14400,E1L1.010,Main Map Layer,
+492,3672804,14400,E1L2.010,Main Map Layer,
+493,3687204,14400,E1L3.010,Main Map Layer,
+494,3701604,14400,E1L4.010,Main Map Layer,
+495,3716004,14400,E1L5.010,Main Map Layer,
+496,3730404,14400,E1L6.010,Main Map Layer,
+497,3744804,14400,E1L7.010,Main Map Layer,
+498,3759204,14400,E1L8.010,Main Map Layer,
+499,3773604,14400,E1L9.010,Main Map Layer,
+500,3788004,14400,E2L1.010,Main Map Layer,Registered Version only
+501,3802404,14400,E2L2.010,Main Map Layer,Registered Version only
+502,3816804,14400,E2L3.010,Main Map Layer,Registered Version only
+503,3831204,14400,E2L4.010,Main Map Layer,Registered Version only
+504,3845604,14400,E2L5.010,Main Map Layer,Registered Version only
+505,3860004,14400,E2L6.010,Main Map Layer,Registered Version only
+506,3874404,14400,E2L7.010,Main Map Layer,Registered Version only
+507,3888804,14400,E2L8.010,Main Map Layer,Registered Version only
+508,3903204,14400,E2L9.010,Main Map Layer,Registered Version only
+509,3917604,14400,E3L1.010,Main Map Layer,Registered Version only
+510,3932004,14400,E3L2.010,Main Map Layer,Registered Version only
+511,3946404,14400,E3L3.010,Main Map Layer,Registered Version only
+512,3960804,14400,E3L4.010,Main Map Layer,Registered Version only
+513,3975204,14400,E3L5.010,Main Map Layer,Registered Version only
+514,3989604,14400,E3L6.010,Main Map Layer,Registered Version only
+515,4004004,14400,E3L7.010,Main Map Layer,Registered Version only
+516,4018404,14400,E3L8.010,Main Map Layer,Registered Version only
+517,4032804,14400,E3L9.010,Main Map Layer,Registered Version only
+518,4047204,14400,E4L1.010,Main Map Layer,Registered Version only
+519,4061604,14400,E4L2.010,Main Map Layer,Registered Version only
+520,4076004,14400,E4L3.010,Main Map Layer,Registered Version only
+521,4090404,14400,E4L4.010,Main Map Layer,Registered Version only
+522,4104804,14400,E4L5.010,Main Map Layer,Registered Version only
+523,4119204,14400,E4L6.010,Main Map Layer,Registered Version only
+524,4133604,14400,E4L7.010,Main Map Layer,Registered Version only
+525,4148004,14400,E4L8.010,Main Map Layer,Registered Version only
+526,4162404,14400,E4L9.010,Main Map Layer,Registered Version only
+527,4176804,14400,E1L1.011,Insert Data Layer,
+528,4191204,14400,E1L2.011,Insert Data Layer,
+529,4205604,14400,E1L3.011,Insert Data Layer,
+530,4220004,14400,E1L4.011,Insert Data Layer,
+531,4234404,14400,E1L5.011,Insert Data Layer,
+532,4248804,14400,E1L6.011,Insert Data Layer,
+533,4263204,14400,E1L7.011,Insert Data Layer,
+534,4277604,14400,E1L8.011,Insert Data Layer,
+535,4292004,14400,E1L9.011,Insert Data Layer,
+536,4306404,14400,E2L1.011,Insert Data Layer,Registered Version only
+537,4320804,14400,E2L2.011,Insert Data Layer,Registered Version only
+538,4335204,14400,E2L3.011,Insert Data Layer,Registered Version only
+539,4349604,14400,E2L4.011,Insert Data Layer,Registered Version only
+540,4364004,14400,E2L5.011,Insert Data Layer,Registered Version only
+541,4378404,14400,E2L6.011,Insert Data Layer,Registered Version only
+542,4392804,14400,E2L7.011,Insert Data Layer,Registered Version only
+543,4407204,14400,E2L8.011,Insert Data Layer,Registered Version only
+544,4421604,14400,E2L9.011,Insert Data Layer,Registered Version only
+545,4436004,14400,E3L1.011,Insert Data Layer,Registered Version only
+546,4450404,14400,E3L2.011,Insert Data Layer,Registered Version only
+547,4464804,14400,E3L3.011,Insert Data Layer,Registered Version only
+548,4479204,14400,E3L4.011,Insert Data Layer,Registered Version only
+549,4493604,14400,E3L5.011,Insert Data Layer,Registered Version only
+550,4508004,14400,E3L6.011,Insert Data Layer,Registered Version only
+551,4522404,14400,E3L7.011,Insert Data Layer,Registered Version only
+552,4536804,14400,E3L8.011,Insert Data Layer,Registered Version only
+553,4551204,14400,E3L9.011,Insert Data Layer,Registered Version only
+554,4565604,14400,E4L1.011,Insert Data Layer,Registered Version only
+555,4580004,14400,E4L2.011,Insert Data Layer,Registered Version only
+556,4594404,14400,E4L3.011,Insert Data Layer,Registered Version only
+557,4608804,14400,E4L4.011,Insert Data Layer,Registered Version only
+558,4623204,14400,E4L5.011,Insert Data Layer,Registered Version only
+559,4637604,14400,E4L6.011,Insert Data Layer,Registered Version only
+560,4652004,14400,E4L7.011,Insert Data Layer,Registered Version only
+561,4666404,14400,E4L8.011,Insert Data Layer,Registered Version only
+562,4680804,14400,E4L9.011,Insert Data Layer,Registered Version only
+563,4695204,28800,E1L1.012,Info Layer,
+564,4724004,28800,E1L2.012,Info Layer,
+565,4752804,28800,E1L3.012,Info Layer,
+566,4781604,28800,E1L4.012,Info Layer,
+567,4810404,28800,E1L5.012,Info Layer,
+568,4839204,28800,E1L6.012,Info Layer,
+569,4868004,28800,E1L7.012,Info Layer,
+570,4896804,28800,E1L8.012,Info Layer,
+571,4925604,28800,E1L9.012,Info Layer,
+572,4954404,28800,E2L1.012,Info Layer,Registered Version only
+573,4983204,28800,E2L2.012,Info Layer,Registered Version only
+574,5012004,28800,E2L3.012,Info Layer,Registered Version only
+575,5040804,28800,E2L4.012,Info Layer,Registered Version only
+576,5069604,28800,E2L5.012,Info Layer,Registered Version only
+577,5098404,28800,E2L6.012,Info Layer,Registered Version only
+578,5127204,28800,E2L7.012,Info Layer,Registered Version only
+579,5156004,28800,E2L8.012,Info Layer,Registered Version only
+580,5184804,28800,E2L9.012,Info Layer,Registered Version only
+581,5213604,28800,E3L1.012,Info Layer,Registered Version only
+582,5242404,28800,E3L2.012,Info Layer,Registered Version only
+583,5271204,28800,E3L3.012,Info Layer,Registered Version only
+584,5300004,28800,E3L4.012,Info Layer,Registered Version only
+585,5328804,28800,E3L5.012,Info Layer,Registered Version only
+586,5357604,28800,E3L6.012,Info Layer,Registered Version only
+587,5386404,28800,E3L7.012,Info Layer,Registered Version only
+588,5415204,28800,E3L8.012,Info Layer,Registered Version only
+589,5444004,28800,E3L9.012,Info Layer,Registered Version only
+590,5472804,28800,E4L1.012,Info Layer,Registered Version only
+591,5501604,28800,E4L2.012,Info Layer,Registered Version only
+592,5530404,28800,E4L3.012,Info Layer,Registered Version only
+593,5559204,28800,E4L4.012,Info Layer,Registered Version only
+594,5588004,28800,E4L5.012,Info Layer,Registered Version only
+595,5616804,28800,E4L6.012,Info Layer,Registered Version only
+596,5645604,28800,E4L7.012,Info Layer,Registered Version only
+597,5674404,28800,E4L8.012,Info Layer,Registered Version only
+598,5703204,28800,E4L9.012,Info Layer,Registered Version only
+599,5732004,1540,FANFARE.MID,MID Format,
+600,5733544,11820,MUSIC01.MID,MID Format,
+601,5745364,8895,MUSIC02.MID,MID Format,
+602,5754259,10778,TITLE.MID,MID Format,
+603,5765037,13889,MUSIC04.MID,MID Format,
+604,5778926,10795,MUSIC05.MID,MID Format,
+605,5789721,9742,MUSIC06.MID,MID Format,
+606,5799463,12525,DUNES.MID,MID Format,
+607,5811988,10441,SPOOKY.MID,MID Format,
+608,5822429,9288,TAJMAHAL.MID,MID Format,
+609,5831717,29099,MUSIC10.MID,MID Format,
+610,5860816,1404,TREE10.MID,MID Format,Registered Version only
+611,5862220,62925,SOUND01.VOC,VOC Format,
+612,5925145,13489,SOUND02.VOC,VOC Format,
+613,5938634,1000,SOUND02.SFX,Hocus Pocus SFX Format,
+614,5939634,9176,SOUND03.VOC,VOC Format,
+615,5948810,16744,SOUND04.VOC,VOC Format,
+616,5965554,18682,SOUND05.VOC,VOC Format,
+617,5984236,11233,SOUND06.VOC,VOC Format,
+618,5995469,6643,SOUND07.VOC,VOC Format,
+619,6002112,1000,SOUND07.SFX,Hocus Pocus SFX Format,
+620,6003112,3935,SOUND08.VOC,VOC Format,
+621,6007047,400,SOUND08.SFX,Hocus Pocus SFX Format,
+622,6007447,4273,SOUND09.VOC,VOC Format,
+623,6011720,400,SOUND09.SFX,Hocus Pocus SFX Format,
+624,6012120,9333,SOUND10.VOC,VOC Format,
+625,6021453,200,SOUND10.SFX,Hocus Pocus SFX Format,
+626,6021653,2705,SOUND11.VOC,VOC Format,
+627,6024358,400,SOUND11.SFX,Hocus Pocus SFX Format,
+628,6024758,2167,SOUND12.VOC,VOC Format,
+629,6026925,400,SOUND12.SFX,Hocus Pocus SFX Format,
+630,6027325,4191,SOUND13.VOC,VOC Format,
+631,6031516,1000,SOUND13.SFX,Hocus Pocus SFX Format,
+632,6032516,4191,SOUND14.VOC,VOC Format,
+633,6036707,1000,SOUND14.SFX,Hocus Pocus SFX Format,
+634,6037707,7241,SOUND15.VOC,VOC Format,
+635,6044948,1200,SOUND15.SFX,Hocus Pocus SFX Format,
+636,6046148,1573,SOUND16.VOC,VOC Format,
+637,6047721,80,SOUND16.SFX,Hocus Pocus SFX Format,
+638,6047801,12361,SOUND17.VOC,VOC Format,
+639,6060162,1000,SOUND17.SFX,Hocus Pocus SFX Format,
+640,6061162,791,SOUND18.VOC,VOC Format,
+641,6061953,400,SOUND18.SFX,Hocus Pocus SFX Format,
+642,6062353,8211,SOUND19.VOC,VOC Format,
+643,6070564,1200,SOUND19.SFX,Hocus Pocus SFX Format,
+644,6071764,5969,SOUND20.VOC,VOC Format,
+645,6077733,1000,SOUND20.SFX,Hocus Pocus SFX Format,
+646,6078733,12863,SOUND21.VOC,VOC Format,
+647,6091596,400,SOUND21.SFX,Hocus Pocus SFX Format,
+648,6091996,1129,SOUND22.VOC,VOC Format,
+649,6093125,400,SOUND22.SFX,Hocus Pocus SFX Format,
+650,6093525,4000,DOSSHARE.BIN,B800 Text,
+651,6097525,4000,DOSREG.BIN,B800 Text,

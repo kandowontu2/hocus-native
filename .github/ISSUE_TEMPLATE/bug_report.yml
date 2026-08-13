@@ -1,0 +1,47 @@
+name: Bug report
+description: Report a reproducible Hocus Native problem
+title: "[Bug]: "
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: Do not attach HOCUS.EXE, HOCUS.DAT, extracted assets, saves, music, or sound files.
+  - type: input
+    id: version
+    attributes:
+      label: Hocus Native version
+      placeholder: v1.0.0
+    validations:
+      required: true
+  - type: dropdown
+    id: source
+    attributes:
+      label: Original game source
+      options:
+        - GOG
+        - Steam
+        - Original registered v1.1 media
+        - Other legal registered v1.1 copy
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What happened?
+      description: Include the level, steps, expected result, and actual result.
+    validations:
+      required: true
+  - type: textarea
+    id: system
+    attributes:
+      label: Windows and hardware details
+      placeholder: Windows version, display scaling, GPU, input device
+    validations:
+      required: true
+  - type: checkboxes
+    id: legal
+    attributes:
+      label: Original files
+      options:
+        - label: I have not attached or linked copyrighted game files or extracted assets.
+          required: true
