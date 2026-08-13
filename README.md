@@ -1,156 +1,202 @@
 # Hocus Native
 
-Hocus Native is a from-scratch native Windows port of the registered v1.1
-MS-DOS release of *Hocus Pocus*. It does not emulate DOS. The locally built
-Windows executable embeds the user's registered-v1.1 `HOCUS.DAT`, while the
-exact full registered-v1.1 `HOCUS.EXE` must remain beside `hocus_native.exe`
-as an ownership/version check.
+**A from-scratch native Windows port of the registered v1.1 MS-DOS release of
+*Hocus Pocus*. No DOS emulator required.**
+
+[![Release](https://img.shields.io/github/v/release/kandowontu/hocus-native?label=release)](https://github.com/kandowontu/hocus-native/releases/latest)
+[![License](https://img.shields.io/badge/source-MIT-blue.svg)](LICENSE.md)
+
+Hocus Native recreates the original game as a Win32 application while retaining
+its levels, movement, menus, saves, sound effects, music, demos, and gameplay
+rules. The project covers all 36 levels in the registered game, from E1L1 to
+E4L9.
 
 > [!IMPORTANT]
-> This repository and its releases contain no original commercial game data.
-> You must own the registered game and provide your own `HOCUS.EXE` and
-> `HOCUS.DAT`. [Buy it on GOG](https://www.gog.com/en/game/hocus_pocus) or
-> [buy it on Steam](https://store.steampowered.com/app/358290/Hocus_Pocus/).
+> This repository and its releases contain **no original commercial game
+> data**. You must own the registered game and provide your own registered-v1.1
+> `HOCUS.EXE` and `HOCUS.DAT`.
+>
+> [Buy Hocus Pocus on GOG](https://www.gog.com/en/game/hocus_pocus) ·
+> [Buy Hocus Pocus on Steam](https://store.steampowered.com/app/358290/Hocus_Pocus/)
 
-Hocus Native is an unofficial fan project and is not affiliated with or
-endorsed by Moonlite Software or Apogee Entertainment. See
-[CREDITS.md](CREDITS.md) for the complete original-game credits, port credits,
-purchase links, and legal notice.
+## Contents
 
-## Current state
+- [What works](#what-works)
+- [Requirements](#requirements)
+- [Build and run](#build-and-run)
+- [Controls](#controls)
+- [Cheat menu](#cheat-menu)
+- [High FPS and fullscreen](#high-fps-and-fullscreen)
+- [Asset extraction](#asset-extraction)
+- [Verification and documentation](#verification-and-documentation)
+- [Credits and license](#credits-and-license)
 
-- The audited registered-v1.1 652-entry archive index is compiled into the
-  native code and validated against `HOCUS.DAT` during the build/test pipeline.
-- All 652 entries in `HOCUS.DAT` can be extracted with stable names and hashes.
-- PCX, planar IMG, VGA palette, font-mask, sprite animations, story text, PCM
-  VOC, and PC-speaker SFX assets are converted to PNG/TXT/WAV files by an
-  offline Python tool. The recovered structures for all 36 levels are also
-  emitted as typed JSON, including sparse event maps and enemy trigger groups.
-- A native Win32 executable reads the archive embedded in its own Windows
-  resource, composites the original piracy/Apogee/registered-title startup
-  sequence, and can select and render every registered level from E1L1 through
-  E4L9 with its own start, backdrop, tiles, maps, events,
-  messages, switches, keyholes, teleporters, enemies, and HUD.
-- The deterministic core runs recovered walking/jumping collision, lightning
-  projectiles and spark trails,
-  destructible walls, item/event dispatch, switches, keyed gates, one-way
-  teleporter sequences, movable elevators, timed super-shot restoration, and
-  ordinary enemy selectors 0 through 6, the selector-8 Episode Three boss, and
-  the four-stage selector-99 Episode Four boss. Recovered phase order,
-  incremental camera, attack/animation state, projectile collision branches,
-  effects, and completion/death lifecycles are regression-tested. All observed
-  indirect control flow is now classified; the parity audit accounts for every
-  registered game-owned target and records the explicit native-service
-  boundaries.
-- The Win32 runner decodes the original 16 VOC effects directly in memory and
-  plays gameplay sound requests through the recovered logical-ID mapping and
-  eight-voice priority allocator; no converted sound files are required.
-- The recovered native front end includes the original eight-entry main menu,
-  episode and skill selection, ordering/story/help/credits/endings, results and
-  high-score entry, the seven-entry in-game pause menu, volume/game-speed/key
-  controls, optional WinMM joystick input, and all nine original save slots.
-  It reads and writes the DOS registered-v1.1 990-byte `HOCUS.SAV` layout and
-  makes a one-time `.bak` before the first explicit native save. Sound, music,
-  joystick, speed, volume, and key settings use their original DOS fields.
-- The generic menu family uses the original `HOCUS.IMG` and `BOTTOM.IMG`
-  composition, proportional gradient font, radial starfield, animated cursor,
-  first-letter shortcuts, persistent selections, and 20-retrace palette fades.
-- The title menu runs the original title/credits/title attract cycle. The
-  original Borland random-number generator selects among all five `DEMO*.DMO`
-  recordings, which are decoded at 20 Hz and replayed on their recovered
-  E1L1/E1L3/E1L5/E1L7/E1L9 levels; any key returns to the menu.
-- CTest covers native archive/render/gameplay rules, 26 typed executable data
-  tables, an exact 154-target game-function ledger, and an end-to-end temporary
-  extraction of all 652 registered-v1.1 assets and 36 typed level files. Save
-  tests round-trip a temporary copy; the installation's original file is never
-  modified by the test suite.
+## What works
 
-Use Arrow keys and Enter through the main, restore, episode, skill, story, help,
-credits, options, and results screens. During play, use Left/Right to move,
-Space to jump, Ctrl to fire, Up to interact or aim upward, and Page Up/Page Down
-to adjust the viewport. Escape opens the recovered pause menu, including Save,
-Restore, Restart, Options, and Quit. Down lowers movable elevators. Wizard
-messages are opened and dismissed with Up. Any key advances the current startup
-screen while preserving the later Apogee and registered-title screens. A new
-Episode 1 campaign shows the original blocking crystal tip before E1L1 begins.
-During a level, Ctrl+Alt+F1 opens a paused cheat menu containing
-all four cheats recovered from the registered game: FEELGOOD invincibility,
-BLAKE infinite keys, QUARK permanent rapid fire, and BANANA infinite laser
-shots. It also provides the native `JUMP IN MID-AIR` toggle; press and release
-Jump again while airborne to start another jump. While enabled, the camera
-tracks Hocus vertically during the full airborne arc. The sixth menu item opens
-a Chapter/Stage selector that can warp directly to any level from E1L1 through
-E4L9. Use Up/Down or 1-6 to select, Enter or Space to activate, and Escape or
-Ctrl+Alt+F1 to close it. The original typed cheat codes remain available as
-one-shot effects.
-The main menu's `HIGH FPS MODE` option (shortcut `F`) adds up to 125 interpolated presentation
-frames per second while retaining the selected original fixed-step game speed;
-it changes visual smoothness only, not physics, enemy logic, timers, or demos.
-The choice persists in `HOCUS_NATIVE.CFG`. Press `Alt+Enter` to toggle
-borderless fullscreen; Alt does not open the Windows system menu.
-Treasures, crystals, health, firepower, keys, and persistent damage fields now
-flow through the original `.012` item dispatcher rules. Every `.007` definition
-now uses its correct source-sprite, health, and selector words, while `.008`
-trigger groups drive native spawning for all registered levels. Collecting a
-level's crystals runs the recovered 90-tick completion lock. Enemy movement,
-attack poses, and embedded projectile artwork use each definition's actual
-source sprite and recovered header ranges. The original VOC effects and MIDI
-music are decoded and played by native Windows services. The registered-v1.1
-game is reconstructed at its logical framebuffer, input, save, timing, and
-audio-dispatch boundaries. CPU-, VGA-, game-port-, and sound-card-cycle identity
-is outside the boundary of a native Windows port.
+### Complete game
 
-## Extract the assets
+- All four episodes and all 36 registered levels
+- Original piracy, Apogee, and registered-title startup sequence
+- Story, help, credits, endings, results, and high-score entry
+- Original title/credits/demo attract cycle with all five recorded demos
+- All nine DOS-compatible save slots
 
-From PowerShell in this directory:
+### Gameplay
+
+- Walking, jumping, collision, elevators, teleporters, switches, and keyed gates
+- Crystals, treasures, health, firepower, keys, super shots, and laser shots
+- Destructible walls, projectiles, spark trails, enemies, and bosses
+- Level messages, crystal tips, death, restart, and completion sequences
+- Registered-v1.1 event, enemy, timing, random-number, and camera rules
+
+### Native Windows features
+
+- Native Win32 rendering and input; DOSBox is not used
+- Original VOC sound effects and MIDI music through Windows services
+- Optional joystick support
+- Borderless fullscreen with `Alt+Enter`
+- Optional interpolated High FPS mode
+- Static C/C++ runtime linkage—users do not need to install runtime libraries
+- `Ctrl+Alt+F1` cheat menu with persistent toggles and level select
+
+For exact parity qualifications and native additions, see the
+[parity audit](docs/PARITY_AUDIT.md).
+
+## Requirements
+
+You need:
+
+1. Windows and either MSVC or MinGW-w64
+2. CMake 3.20 or newer
+3. Ninja
+4. Your own registered-v1.1 `HOCUS.EXE` and `HOCUS.DAT`
+
+Place both original files in the repository root before configuring the build:
+
+```text
+hocus-native/
+├── HOCUS.EXE
+├── HOCUS.DAT
+├── CMakeLists.txt
+└── src/
+```
+
+The filenames are case-insensitive on Windows. Shareware, altered, or missing
+executables are rejected.
+
+## Build and run
+
+Open PowerShell in the repository directory:
+
+```powershell
+cmake -S . -B build -G Ninja -DCMAKE_BUILD_TYPE=Release
+cmake --build build
+ctest --test-dir build --output-on-failure
+./build/hocus_native.exe
+```
+
+The build embeds your `HOCUS.DAT` in `hocus_native.exe` and copies the required
+`HOCUS.EXE` beside it. The finished game therefore needs these two files in the
+same directory:
+
+```text
+hocus_native.exe
+HOCUS.EXE
+```
+
+`HOCUS.DAT` is not required beside the finished executable because your copy is
+embedded during the build. Do not redistribute the resulting executable: it
+contains commercial game data from your copy.
+
+To create a local ZIP package:
+
+```powershell
+cmake --build build --target package
+```
+
+An existing `HOCUS.SAV` may be placed beside the executable. Otherwise, the
+game creates a compatible blank save when you first save. Before modifying an
+existing DOS save, Hocus Native creates a one-time backup.
+
+## Controls
+
+| Action | Default control |
+|---|---|
+| Move | Left / Right Arrow |
+| Jump | `Space` |
+| Fire | `Ctrl` |
+| Interact, read messages, or aim upward | Up Arrow |
+| Lower a movable elevator | Down Arrow |
+| Scroll the viewport | `Page Up` / `Page Down` |
+| Pause menu | `Esc` |
+| Toggle fullscreen | `Alt+Enter` |
+| Open cheat menu during play | `Ctrl+Alt+F1` |
+
+Use the Arrow keys and `Enter` to navigate menus. Any key advances startup
+screens while preserving the Apogee and registered-title sequence.
+
+## Cheat menu
+
+Press `Ctrl+Alt+F1` during a level. Use Up/Down or keys `1`–`6` to select an
+entry, then press `Enter` or `Space`. Press `Esc` or `Ctrl+Alt+F1` to close the
+menu.
+
+| Entry | Effect |
+|---|---|
+| `FEELGOOD` | Full health and invincibility |
+| `BLAKE` | Infinite silver and gold keys |
+| `QUARK` | Permanent rapid fire |
+| `BANANA` | Infinite laser shots |
+| `JUMP IN MID-AIR` | Jump again while airborne; the camera follows vertically |
+| `CHAPTER/STAGE SELECT` | Warp to any level from E1L1 through E4L9 |
+
+The four original typed cheat codes remain available as one-shot effects.
+
+## High FPS and fullscreen
+
+`HIGH FPS MODE` appears on the main menu with shortcut `F`. When enabled, it
+presents up to 125 interpolated frames per second while leaving the original
+fixed-step physics, enemy logic, timers, random stream, and demos unchanged.
+The setting persists in `HOCUS_NATIVE.CFG`.
+
+Press `Alt+Enter` at any time to toggle borderless fullscreen. Alt does not
+activate the Windows system menu.
+
+## Asset extraction
+
+The optional extraction tool validates your EXE and DAT, exports all 652 archive
+entries, converts supported formats, and writes typed metadata for all 36
+levels:
 
 ```powershell
 python tools/extract_assets.py
 ```
 
-The command validates that the EXE and DAT match, extracts every archive entry
-to `assets/raw`, converts supported formats to `assets/converted`, and writes a
-machine-readable `assets/manifest.json`. The `assets` directory is intentionally
-ignored by Git because it contains copyrighted data from the user's copy.
-Recovered level metadata is written to `assets/converted/levels/E?L?.json`.
+Output is written beneath `assets/`, which Git intentionally ignores because it
+contains copyrighted data from your copy.
 
-## Build on Windows
+## Verification and documentation
 
-The project builds with MSVC or MinGW-w64:
+The test suite covers archive and rendering rules, gameplay behavior, standalone
+runtime imports, registered-executable validation, recovered executable tables,
+the extraction pipeline, and the parity ledger.
 
-```powershell
-cmake -S . -B build -G Ninja
-cmake --build build
-ctest --test-dir build --output-on-failure
-cmake --build build --target package
-./build/hocus_native.exe
-```
+| Document | Contents |
+|---|---|
+| [Architecture](docs/ARCHITECTURE.md) | Binary facts, asset layout, and port boundaries |
+| [Executable analysis](docs/EXECUTABLE.md) | MZ-aware disassembly and control-flow map |
+| [Gameplay reconstruction](docs/GAMEPLAY.md) | Instruction-level gameplay evidence |
+| [Parity audit](docs/PARITY_AUDIT.md) | Function ledger, matches, and native qualifications |
+| [Laser audit](docs/LASER_AUDIT.md) | Complete laser-shot behavior audit |
+| [1.0 release notes](docs/RELEASE_NOTES_1.0.md) | Release highlights and validation |
 
-Keep `HOCUS.EXE` and `HOCUS.DAT` in this source directory while building and
-running the reconstruction tests. `HOCUS.DAT` is embedded into
-`hocus_native.exe` by the resource compiler. To run a packaged build, copy the
-full registered-v1.1 `HOCUS.EXE` into the same folder as `hocus_native.exe`.
-The runtime validates its exact 182,656-byte registered-v1.1 SHA-256 identity;
-shareware, altered, or missing executables are rejected. No separately
-installed C/C++ runtime or external `HOCUS.DAT` is required.
-The MSVC build uses the static runtime and the MinGW build statically links its
-GCC, standard-library, and threading runtimes; only Windows system DLLs remain
-as imports. An existing `HOCUS.SAV` may be placed beside
-the executable; otherwise a compatible blank save is created when the player
-first saves. The native runtime never probes parent/source directories for a
-DOS save.
+## Credits and license
 
-See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md) for confirmed binary facts and
-the reconstruction boundaries, and [docs/EXECUTABLE.md](docs/EXECUTABLE.md) for
-the current MZ-aware disassembly map. [docs/GAMEPLAY.md](docs/GAMEPLAY.md)
-records the instruction-level evidence behind native movement and collision.
-The exhaustive discovered-function ledger and native-boundary qualifications are
-in [docs/PARITY_AUDIT.md](docs/PARITY_AUDIT.md). The complete laser-path audit
-is in [docs/LASER_AUDIT.md](docs/LASER_AUDIT.md).
-
-## License
+Hocus Native is an unofficial fan project and is not affiliated with or
+endorsed by Moonlite Software or Apogee Entertainment. See [CREDITS.md](CREDITS.md)
+for the original-game credits, port credits, purchase links, and legal notice.
 
 The original Hocus Native source code is available under the
 [MIT License](LICENSE.md). That license does not apply to *Hocus Pocus* or any
-original game content. Commercial game files and extracted assets must never
-be committed or redistributed.
+original game content. Never commit or redistribute `HOCUS.EXE`, `HOCUS.DAT`,
+`HOCUS.SAV`, extracted assets, or locally built binaries containing game data.
