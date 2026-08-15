@@ -904,6 +904,7 @@ int main(int argc, char** argv) {
             return 1;
         }
         for (const int expanded_width : {
+                 hocus::widescreen_frame_width,
                  hocus::ultrawide_frame_width,
                  hocus::super_ultrawide_frame_width}) {
             hocus::GameLevel expanded_game(
@@ -917,31 +918,24 @@ int main(int argc, char** argv) {
             const int expected_player_x = 106 * 8 - expected_camera_x;
             const int expanded_ui_offset =
                 (expanded_width - hocus::original_frame_width) / 2;
-            bool neutral_hud_sides = true;
+            bool black_hud_sides = true;
             for (int y = hocus::gameplay_viewport_height;
-                 y < hocus::game_frame_height && neutral_hud_sides; ++y) {
-                const auto left_edge = standard_scene.image.pixels[
-                    static_cast<std::size_t>(y) *
-                    hocus::original_frame_width];
-                const auto right_edge = standard_scene.image.pixels[
-                    static_cast<std::size_t>(y) *
-                        hocus::original_frame_width +
-                    hocus::original_frame_width - 1];
+                 y < hocus::game_frame_height && black_hud_sides; ++y) {
                 for (int x = 0; x < expanded_ui_offset; ++x) {
                     if (expanded_scene.image.pixels[
                             static_cast<std::size_t>(y) * expanded_width + x] !=
-                        left_edge) {
-                        neutral_hud_sides = false;
+                        0U) {
+                        black_hud_sides = false;
                         break;
                     }
                 }
                 for (int x = expanded_ui_offset +
                                  hocus::original_frame_width;
-                     x < expanded_width && neutral_hud_sides; ++x) {
+                     x < expanded_width && black_hud_sides; ++x) {
                     if (expanded_scene.image.pixels[
                             static_cast<std::size_t>(y) * expanded_width + x] !=
-                        right_edge) {
-                        neutral_hud_sides = false;
+                        0U) {
+                        black_hud_sides = false;
                         break;
                     }
                 }
@@ -952,7 +946,7 @@ int main(int argc, char** argv) {
                 expanded_scene.camera_pixel_x != expected_camera_x ||
                 !sprite_matches(expanded_scene.image, player,
                                 expected_player_x, 80) ||
-                !neutral_hud_sides) {
+                !black_hud_sides) {
                 std::cerr << "expanded aspect gameplay render mismatch\n";
                 return 1;
             }
@@ -1834,34 +1828,21 @@ int main(int argc, char** argv) {
             std::cerr << "enemy trigger count mismatch\n";
             return 1;
         }
-        // Expanded modes expose enemy anchor cells outside the centred
-        // registered playfield. Prewarm an E1L1 anchor in that side band before
-        // Hocus reaches trigger 116, while OFF retains contact-only activation.
-        hocus::GameLevel dormant_offscreen_anchor(archive);
-        dormant_offscreen_anchor.place_player(72, 57 * 16);
-        dormant_offscreen_anchor.tick({});
-        if (dormant_offscreen_anchor.active_enemy_count() != 0) {
-            std::cerr << "registered enemy prewarm path changed\n";
-            return 1;
-        }
-        for (const int expanded_width : {
+        // Widescreen must not activate enemy anchors merely because the added
+        // columns reveal them. All modes retain the registered player-contact
+        // trigger timing; at this position trigger 116 has not been reached.
+        for (const int enemy_trigger_width : {
+                 hocus::original_frame_width,
                  hocus::widescreen_frame_width,
                  hocus::ultrawide_frame_width,
                  hocus::super_ultrawide_frame_width}) {
-            hocus::GameLevel expanded_enemy_anchor(
-                archive, {1, 1}, 0, 0, false, expanded_width);
-            expanded_enemy_anchor.place_player(72, 57 * 16);
-            expanded_enemy_anchor.tick({});
-            const auto anchor = std::find_if(
-                expanded_enemy_anchor.enemies().begin(),
-                expanded_enemy_anchor.enemies().end(),
-                [](const hocus::EnemyState& enemy) {
-                    return enemy.active &&
-                           enemy.spawn_cell == 57 * 240 + 25;
-                });
-            if (anchor == expanded_enemy_anchor.enemies().end() ||
-                anchor->spawn_ticks != 19) {
-                std::cerr << "expanded enemy side-band prewarm mismatch\n";
+            hocus::GameLevel dormant_enemy_anchor(
+                archive, {1, 1}, 0, 0, false, enemy_trigger_width);
+            dormant_enemy_anchor.place_player(72, 57 * 16);
+            dormant_enemy_anchor.tick({});
+            if (dormant_enemy_anchor.active_enemy_count() != 0) {
+                std::cerr << "premature widescreen enemy activation at width "
+                          << enemy_trigger_width << '\n';
                 return 1;
             }
         }

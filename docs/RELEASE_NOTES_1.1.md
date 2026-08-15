@@ -12,13 +12,11 @@ from the superseded 1.1.0 release.
   the game image is never horizontally stretched
 - Expanded camera, map, entity, enemy-shot, Hocus-projectile, and visible
   tile-mutation bounds; opened doors no longer remain pending at ultrawide edges
-- Enemy anchors entering the added side bands now begin their original 20-tick
-  Twinks spawn sequence before reaching the central 4:3 playfield
 - Enemy release bounds now cover the complete expanded viewport, preventing
   visible 21:9 and 32:9 enemies from being discarded and repeatedly respawned
-- Side-band prewarming respects the original eight-enemy pool and prioritizes
-  anchors nearest the central playfield
-- Original 320-pixel HUD centred exactly once between neutral stone side panels
+- Enemy encounters retain their original player-contact trigger timing in every
+  aspect ratio; added side columns never activate dormant encounters early
+- Original 320-pixel HUD centred exactly once between solid-black side panels
 - Original menus, startup screens, story pages, and other fixed artwork remain
   unchanged at 320x200
 - Monitor-work-area-aware window sizing for ultrawide modes
