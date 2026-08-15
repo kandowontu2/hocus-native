@@ -206,8 +206,9 @@ inside a bounded jump table are listed with their owning dispatcher.
   suppressed so Alt remains available to the game's configurable controls.
 - `WIDESCREEN MODE` is an explicit native main-menu addition. It cycles through
   OFF, 16:9 (356x200), 21:9 (467x200), and 32:9 (711x200), extends the
-  map/entity/projectile view and its camera bounds, centres the original HUD
-  within tiled side trim, and leaves all fixed front-end artwork at 320x200.
+  map/entity/projectile view, camera bounds, and visible tile-mutation strip,
+  centres the original HUD once between neutral edge-extended stone panels,
+  and leaves all fixed front-end artwork at 320x200.
   It defaults to OFF, so the registered framebuffer and culling path remain
   unchanged. Its `W` accelerator and value persist in `HOCUS_NATIVE.CFG`.
 - `HIGH FPS MODE` is an explicit native main-menu addition. It presents up to

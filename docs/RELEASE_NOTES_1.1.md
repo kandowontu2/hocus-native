@@ -1,7 +1,8 @@
-# Hocus Native 1.1.0
+# Hocus Native 1.1.1
 
 The first feature update to the from-scratch native Windows port of the
-registered-v1.1 MS-DOS game *Hocus Pocus*.
+registered-v1.1 MS-DOS game *Hocus Pocus*, including widescreen corrections
+from the superseded 1.1.0 release.
 
 ## Highlights
 
@@ -9,8 +10,9 @@ registered-v1.1 MS-DOS game *Hocus Pocus*.
   settings
 - Real additional gameplay rendering at 320x200, 356x200, 467x200, or 711x200;
   the game image is never horizontally stretched
-- Expanded camera, map, entity, enemy-shot, and Hocus-projectile view bounds
-- Original 320-pixel HUD centred over matching tiled side trim
+- Expanded camera, map, entity, enemy-shot, Hocus-projectile, and visible
+  tile-mutation bounds; opened doors no longer remain pending at ultrawide edges
+- Original 320-pixel HUD centred exactly once between neutral stone side panels
 - Original menus, startup screens, story pages, and other fixed artwork remain
   unchanged at 320x200
 - Monitor-work-area-aware window sizing for ultrawide modes

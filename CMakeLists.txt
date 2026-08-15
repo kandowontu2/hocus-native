@@ -4,7 +4,7 @@ if(POLICY CMP0091)
     cmake_policy(SET CMP0091 NEW)
 endif()
 
-project(HocusNative VERSION 1.1.0 LANGUAGES CXX RC)
+project(HocusNative VERSION 1.1.1 LANGUAGES CXX RC)
 
 if(MSVC)
     set(CMAKE_MSVC_RUNTIME_LIBRARY

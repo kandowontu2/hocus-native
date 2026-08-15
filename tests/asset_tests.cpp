@@ -915,12 +915,44 @@ int main(int argc, char** argv) {
             const int expected_camera_x =
                 (106 - horizontal_focus_half_tiles) * 8;
             const int expected_player_x = 106 * 8 - expected_camera_x;
+            const int expanded_ui_offset =
+                (expanded_width - hocus::original_frame_width) / 2;
+            bool neutral_hud_sides = true;
+            for (int y = hocus::gameplay_viewport_height;
+                 y < hocus::game_frame_height && neutral_hud_sides; ++y) {
+                const auto left_edge = standard_scene.image.pixels[
+                    static_cast<std::size_t>(y) *
+                    hocus::original_frame_width];
+                const auto right_edge = standard_scene.image.pixels[
+                    static_cast<std::size_t>(y) *
+                        hocus::original_frame_width +
+                    hocus::original_frame_width - 1];
+                for (int x = 0; x < expanded_ui_offset; ++x) {
+                    if (expanded_scene.image.pixels[
+                            static_cast<std::size_t>(y) * expanded_width + x] !=
+                        left_edge) {
+                        neutral_hud_sides = false;
+                        break;
+                    }
+                }
+                for (int x = expanded_ui_offset +
+                                 hocus::original_frame_width;
+                     x < expanded_width && neutral_hud_sides; ++x) {
+                    if (expanded_scene.image.pixels[
+                            static_cast<std::size_t>(y) * expanded_width + x] !=
+                        right_edge) {
+                        neutral_hud_sides = false;
+                        break;
+                    }
+                }
+            }
             if (expanded_game.viewport_width() != expanded_width ||
                 expanded_scene.image.width != expanded_width ||
                 expanded_scene.image.height != hocus::game_frame_height ||
                 expanded_scene.camera_pixel_x != expected_camera_x ||
                 !sprite_matches(expanded_scene.image, player,
-                                expected_player_x, 80)) {
+                                expected_player_x, 80) ||
+                !neutral_hud_sides) {
                 std::cerr << "expanded aspect gameplay render mismatch\n";
                 return 1;
             }
@@ -1731,6 +1763,34 @@ int main(int argc, char** argv) {
             locked_gate.main_tile_at(53, 58) != 0xFF) {
             std::cerr << "keyhole door mutation mismatch\n";
             return 1;
+        }
+        // In expanded modes the E1L1 keyhole and its door can both be visible
+        // while the door lies beyond the registered 21-column update strip.
+        // Consuming the key must expand that strip with the viewport so the
+        // pending removal is applied without requiring a camera detour.
+        for (const int expanded_width : {
+                 hocus::widescreen_frame_width,
+                 hocus::ultrawide_frame_width,
+                 hocus::super_ultrawide_frame_width}) {
+            hocus::GameLevel expanded_gate(
+                archive, {1, 1}, 0, 0, false, expanded_width);
+            expanded_gate.place_player(34, 46 * 16);
+            expanded_gate.tick({});
+            expanded_gate.place_player(96, 57 * 16);
+            expanded_gate.tick({});
+            if (expanded_gate.progress().silver_key ||
+                expanded_gate.event_at(49, 57) != 30000) {
+                std::cerr << "expanded keyhole consumption mismatch\n";
+                return 1;
+            }
+            for (int tick = 0; tick < 19; ++tick) {
+                expanded_gate.tick({});
+            }
+            if (expanded_gate.main_tile_at(53, 57) != 0xFF ||
+                expanded_gate.main_tile_at(53, 58) != 0xFF) {
+                std::cerr << "expanded keyhole door mutation mismatch\n";
+                return 1;
+            }
         }
 
         // Events 56..80 are a separate, previously omitted `.005` family.

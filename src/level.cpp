@@ -1349,16 +1349,21 @@ void GameLevel::process_gate_event(const std::size_t cell,
 
 void GameLevel::update_tile_viewport() {
     // 0BA5:2C81 runs on alternating fixed updates. It decrements the one
-    // shared gate timer and visits exactly the 21 x 10 map cells covered by
-    // the potentially half-tile-aligned viewport.
+    // shared gate timer and visits the map cells covered by the potentially
+    // half-tile-aligned viewport. The registered 320-pixel path remains
+    // exactly 21 columns; native expanded modes must include their additional
+    // visible columns so a consumed key cannot leave an on-screen door pending.
     --gate_countdown_;
     const int first_column = floor_div(camera_x_half_tiles_, 2);
+    const int visible_column_count =
+        (viewport_width_ + tile_size - 1) / tile_size + 1;
     for (int row_offset = 0; row_offset < 10; ++row_offset) {
         const int row = camera_y_rows_ + row_offset;
         if (row < 0 || row >= map_height) {
             continue;
         }
-        for (int column_offset = 0; column_offset < 21; ++column_offset) {
+        for (int column_offset = 0;
+             column_offset < visible_column_count; ++column_offset) {
             const int column = first_column + column_offset;
             if (column < 0 || column >= map_width) {
                 continue;
@@ -1375,7 +1380,8 @@ void GameLevel::update_tile_viewport() {
                         main_layer_[cell] = original_main_layer_[cell];
                     }
                     pending_gate_layer_[cell] = 0;
-                    if (!forced && column_offset < 20) {
+                    if (!forced &&
+                        column_offset < visible_column_count - 1) {
                         spawn_twinkle(column * tile_size - camera_pixel_x(),
                                       row * tile_size - camera_pixel_y());
                     }
@@ -3491,11 +3497,13 @@ LevelScene GameLevel::render(const double interpolation) const {
     draw_enemies(frame, camera_x, camera_y, interpolation, ui_x_offset);
     draw_visual_effects(frame);
     draw_projectiles(frame, camera_x, camera_y, interpolation);
-    // NEW_HUD.IMG is exactly 320 pixels wide. Repeat its stonework into the
-    // side extensions, keeping the complete original HUD centred and intact.
+    // NEW_HUD.IMG is exactly 320 pixels wide. Keep one complete copy centred,
+    // then extend only its outermost stone edge into the side panels. Wrapping
+    // the full image here duplicates labels and counters in ultrawide modes.
     for (int y = 0; y < hud_.height; ++y) {
         for (int x = 0; x < frame.width; ++x) {
-            const int source_x = (x - ui_x_offset + hud_.width) % hud_.width;
+            const int source_x = std::clamp(
+                x - ui_x_offset, 0, hud_.width - 1);
             frame.pixels[static_cast<std::size_t>(viewport_height + y) *
                              frame.width + x] =
                 hud_.pixels[static_cast<std::size_t>(y) * hud_.width +
