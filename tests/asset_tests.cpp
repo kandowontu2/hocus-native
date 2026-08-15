@@ -1834,6 +1834,67 @@ int main(int argc, char** argv) {
             std::cerr << "enemy trigger count mismatch\n";
             return 1;
         }
+        // Expanded modes expose enemy anchor cells outside the centred
+        // registered playfield. Prewarm an E1L1 anchor in that side band before
+        // Hocus reaches trigger 116, while OFF retains contact-only activation.
+        hocus::GameLevel dormant_offscreen_anchor(archive);
+        dormant_offscreen_anchor.place_player(72, 57 * 16);
+        dormant_offscreen_anchor.tick({});
+        if (dormant_offscreen_anchor.active_enemy_count() != 0) {
+            std::cerr << "registered enemy prewarm path changed\n";
+            return 1;
+        }
+        for (const int expanded_width : {
+                 hocus::widescreen_frame_width,
+                 hocus::ultrawide_frame_width,
+                 hocus::super_ultrawide_frame_width}) {
+            hocus::GameLevel expanded_enemy_anchor(
+                archive, {1, 1}, 0, 0, false, expanded_width);
+            expanded_enemy_anchor.place_player(72, 57 * 16);
+            expanded_enemy_anchor.tick({});
+            const auto anchor = std::find_if(
+                expanded_enemy_anchor.enemies().begin(),
+                expanded_enemy_anchor.enemies().end(),
+                [](const hocus::EnemyState& enemy) {
+                    return enemy.active &&
+                           enemy.spawn_cell == 57 * 240 + 25;
+                });
+            if (anchor == expanded_enemy_anchor.enemies().end() ||
+                anchor->spawn_ticks != 19) {
+                std::cerr << "expanded enemy side-band prewarm mismatch\n";
+                return 1;
+            }
+        }
+
+        // E1L1 trigger 123 places enemies 11 and 16 cells to Hocus's right.
+        // The DOS +480 release boundary is valid at 320 pixels but intersects
+        // those visible spawn locations in 21:9 and 32:9. Every expanded mode
+        // must retain both slots while OFF keeps its exact recovered boundary.
+        for (const int enemy_view_width : {
+                 hocus::original_frame_width,
+                 hocus::widescreen_frame_width,
+                 hocus::ultrawide_frame_width,
+                 hocus::super_ultrawide_frame_width}) {
+            hocus::GameLevel expanded_enemy_release(
+                archive, {1, 1}, 0, 0, false, enemy_view_width);
+            expanded_enemy_release.place_player(77 * 2, 54 * 16);
+            expanded_enemy_release.tick({});
+            const auto retained_spawn = [&](const int column) {
+                return std::any_of(
+                    expanded_enemy_release.enemies().begin(),
+                    expanded_enemy_release.enemies().end(),
+                    [column](const hocus::EnemyState& enemy) {
+                        return enemy.active &&
+                               enemy.spawn_cell == 54 * 240 + column;
+                    });
+            };
+            if (!retained_spawn(88) || !retained_spawn(93)) {
+                std::cerr << "expanded enemy release-bound mismatch at width "
+                          << enemy_view_width << ": "
+                          << expanded_enemy_release.active_enemy_count() << '\n';
+                return 1;
+            }
+        }
         const auto spawn_sounds = enemy_trigger.take_sound_events();
         if (std::count(spawn_sounds.begin(), spawn_sounds.end(), 14) != 1) {
             std::cerr << "enemy spawn-sound throttle mismatch\n";

@@ -457,6 +457,8 @@ private:
     void enforce_enabled_cheats() noexcept;
     void update_projectiles();
     void process_enemy_trigger(std::uint16_t event, bool primary_sample);
+    bool queue_enemy_spawn(int type, int spawn_cell);
+    void prewarm_expanded_enemy_spawns();
     void spawn_pending_enemies();
     void spawn_episode_four_boss(int stage, bool initial_spawn);
     void initialise_enemy_motion(EnemyState& enemy);

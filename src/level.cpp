@@ -1426,35 +1426,116 @@ void GameLevel::process_enemy_trigger(std::uint16_t event,
         if (type == 0xFFFF) {
             break;
         }
-        const auto spawn_cell = trigger.spawn_cells[slot];
-        if (type >= enemy_definitions_.size() ||
-            !enemy_definitions_[type].available ||
-            spawn_cell >= event_layer_.size() ||
-            event_layer_[spawn_cell] != 106 + type) {
-            continue;
-        }
+        queue_enemy_spawn(static_cast<int>(type),
+                          static_cast<int>(trigger.spawn_cells[slot]));
+    }
+}
 
-        const bool already_live = std::any_of(
+bool GameLevel::queue_enemy_spawn(const int type, const int spawn_cell) {
+    if (type < 0 || type >= static_cast<int>(enemy_definitions_.size()) ||
+        !enemy_definitions_[static_cast<std::size_t>(type)].available ||
+        spawn_cell < 0 ||
+        spawn_cell >= static_cast<int>(event_layer_.size()) ||
+        event_layer_[static_cast<std::size_t>(spawn_cell)] != 106 + type) {
+        return false;
+    }
+
+    const bool already_live = std::any_of(
+        enemies_.begin(), enemies_.end(),
+        [spawn_cell](const EnemyState& enemy) {
+            return enemy.active && enemy.spawn_cell == spawn_cell;
+        });
+    const bool already_pending = std::any_of(
+        pending_enemy_spawns_.begin(), pending_enemy_spawns_.end(),
+        [spawn_cell](const PendingEnemySpawn& pending) {
+            return pending.active && pending.spawn_cell == spawn_cell;
+        });
+    if (already_live || already_pending) {
+        return false;
+    }
+
+    const auto pending = std::find_if(
+        pending_enemy_spawns_.begin(), pending_enemy_spawns_.end(),
+        [](const PendingEnemySpawn& candidate) { return !candidate.active; });
+    if (pending != pending_enemy_spawns_.end()) {
+        *pending = {type, spawn_cell, true};
+        return true;
+    }
+    return false;
+}
+
+void GameLevel::prewarm_expanded_enemy_spawns() {
+    if (viewport_width_ == original_frame_width) {
+        return;
+    }
+
+    // Widescreen exposes map columns which did not exist in the registered
+    // 320-pixel presentation. Queue enemy anchors in those side bands as soon
+    // as they become visible, giving the recovered 20-tick Twinks/countdown
+    // time to run before the anchor reaches the original central playfield.
+    // The centred 320-pixel region deliberately retains player-contact trigger
+    // semantics, and the OFF path never enters this native extension.
+    const int camera_x = camera_pixel_x();
+    const int camera_right = camera_x + viewport_width_;
+    const int side_width = (viewport_width_ - original_frame_width) / 2;
+    const int central_left = camera_x + side_width;
+    const int central_right = central_left + original_frame_width;
+    const int first_column = floor_div(camera_x, tile_size);
+    const int last_column = floor_div(camera_right - 1, tile_size);
+    const int occupied_slots =
+        static_cast<int>(std::count_if(
             enemies_.begin(), enemies_.end(),
-            [spawn_cell](const EnemyState& enemy) {
-                return enemy.active && enemy.spawn_cell == spawn_cell;
-            });
-        const bool already_pending = std::any_of(
+            [](const EnemyState& enemy) { return enemy.active; })) +
+        static_cast<int>(std::count_if(
             pending_enemy_spawns_.begin(), pending_enemy_spawns_.end(),
-            [spawn_cell](const PendingEnemySpawn& pending) {
-                return pending.active && pending.spawn_cell == spawn_cell;
-            });
-        if (already_live || already_pending) {
+            [](const PendingEnemySpawn& pending) { return pending.active; }));
+    const int available_slots = std::max(
+        0, static_cast<int>(enemies_.size()) - occupied_slots);
+    if (available_slots == 0) {
+        return;
+    }
+
+    std::vector<std::pair<int, int>> candidates;
+
+    for (int row = camera_y_rows_;
+         row < camera_y_rows_ + viewport_height / tile_size; ++row) {
+        if (row < 0 || row >= map_height) {
             continue;
         }
-
-        const auto pending = std::find_if(
-            pending_enemy_spawns_.begin(), pending_enemy_spawns_.end(),
-            [](const PendingEnemySpawn& candidate) { return !candidate.active; });
-        if (pending == pending_enemy_spawns_.end()) {
-            return;
+        for (int column = first_column; column <= last_column; ++column) {
+            if (column < 0 || column >= map_width) {
+                continue;
+            }
+            const int cell_left = column * tile_size;
+            const int cell_right = cell_left + tile_size;
+            if (cell_right > central_left && cell_left < central_right) {
+                continue;
+            }
+            const auto cell = static_cast<std::size_t>(row) * map_width +
+                              column;
+            const int event = event_layer_[cell];
+            if (event >= 106 && event < 116) {
+                const int distance = cell_right <= central_left
+                    ? central_left - cell_right
+                    : cell_left - central_right;
+                candidates.emplace_back(distance, static_cast<int>(cell));
+            }
         }
-        *pending = {static_cast<int>(type), static_cast<int>(spawn_cell), true};
+    }
+
+    // The registered engine has eight live enemy slots. Wide side bands can
+    // contain more than eight dormant anchors, so prefer those nearest the
+    // central playfield and never let speculative prewarming occupy pending
+    // capacity needed by a player-contact trigger processed above.
+    std::sort(candidates.begin(), candidates.end());
+    int queued = 0;
+    for (const auto& [distance, cell] : candidates) {
+        (void)distance;
+        if (queue_enemy_spawn(event_layer_[static_cast<std::size_t>(cell)] - 106,
+                              cell) &&
+            ++queued == available_slots) {
+            break;
+        }
     }
 }
 
@@ -2255,6 +2336,7 @@ void GameLevel::update_enemies() {
 void GameLevel::release_distant_enemies() {
     const int camera_x = camera_pixel_x();
     const int camera_y = camera_pixel_y();
+    const int right_release_margin = 480 - original_frame_width;
 
     // 0BA5:0439 runs after the enemy update. It frees ordinary enemies outside
     // the expanded camera rectangle without clearing the persistent event, so
@@ -2264,7 +2346,8 @@ void GameLevel::release_distant_enemies() {
             continue;
         }
         if (enemy.x_pixels < camera_x - 200 ||
-            enemy.x_pixels > camera_x + 480 ||
+            enemy.x_pixels > camera_x + viewport_width_ +
+                                 right_release_margin ||
             enemy.y_pixels < camera_y - 120 ||
             enemy.y_pixels > camera_y + 510) {
             enemy.active = false;
@@ -2891,6 +2974,7 @@ void GameLevel::tick(const InputState& input) {
             --progress_.damage_cooldown;
         }
         process_events(action_pressed);
+        prewarm_expanded_enemy_spawns();
     }
     enforce_enabled_cheats();
 

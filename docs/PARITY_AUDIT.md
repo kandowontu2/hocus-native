@@ -207,6 +207,8 @@ inside a bounded jump table are listed with their owning dispatcher.
 - `WIDESCREEN MODE` is an explicit native main-menu addition. It cycles through
   OFF, 16:9 (356x200), 21:9 (467x200), and 32:9 (711x200), extends the
   map/entity/projectile view, camera bounds, and visible tile-mutation strip,
+  prewarms enemy anchors entering the added side bands and extends the enemy
+  release bound across the complete visible width,
   centres the original HUD once between neutral edge-extended stone panels,
   and leaves all fixed front-end artwork at 320x200.
   It defaults to OFF, so the registered framebuffer and culling path remain

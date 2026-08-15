@@ -160,9 +160,11 @@ cycles through `OFF`, `16:9`, `21:9`, and `32:9`. These modes use 320×200,
 356×200, 467×200, and 711×200 logical framebuffers respectively, drawing
 progressively more map, entity, and projectile space on both sides rather than
 stretching the image. The original status bar remains centred exactly once,
-with neutral stone side panels. Menus, startup screens, story pages, and other
-original artwork remain at their unmodified 320×200 dimensions. The setting
-persists in `HOCUS_NATIVE.CFG`.
+with neutral stone side panels. Enemy anchors entering the added side regions
+begin their original spawn effect there instead of popping into the central
+playfield. Menus, startup screens, story pages, and other original artwork
+remain at their unmodified 320×200 dimensions. The setting persists in
+`HOCUS_NATIVE.CFG`.
 
 `HIGH FPS MODE` appears on the main menu with shortcut `F`. When enabled, it
 presents up to 125 interpolated frames per second while leaving the original
