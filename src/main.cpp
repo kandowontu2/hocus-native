@@ -140,6 +140,7 @@ bool g_sound_enabled{true};
 bool g_music_enabled{true};
 bool g_joystick_enabled{};
 bool g_high_fps_mode{};
+hocus::WidescreenMode g_widescreen_mode{hocus::WidescreenMode::off};
 bool g_fullscreen{};
 int g_sound_volume{15};
 int g_music_volume{15};
@@ -269,6 +270,47 @@ constexpr std::array<std::string_view, hocus::cheat_code_count>
         "BANANA - Infinite laser shots",
         "JUMP IN MID-AIR - Jump while airborne",
     };
+
+int active_gameplay_frame_width() noexcept {
+    switch (g_widescreen_mode) {
+    case hocus::WidescreenMode::ratio_16_9:
+        return hocus::widescreen_frame_width;
+    case hocus::WidescreenMode::ratio_21_9:
+        return hocus::ultrawide_frame_width;
+    case hocus::WidescreenMode::ratio_32_9:
+        return hocus::super_ultrawide_frame_width;
+    case hocus::WidescreenMode::off:
+        return hocus::original_frame_width;
+    }
+    return hocus::original_frame_width;
+}
+
+std::string_view widescreen_mode_label() noexcept {
+    switch (g_widescreen_mode) {
+    case hocus::WidescreenMode::ratio_16_9: return "16:9";
+    case hocus::WidescreenMode::ratio_21_9: return "21:9";
+    case hocus::WidescreenMode::ratio_32_9: return "32:9";
+    case hocus::WidescreenMode::off: return "OFF";
+    }
+    return "OFF";
+}
+
+void advance_widescreen_mode() noexcept {
+    switch (g_widescreen_mode) {
+    case hocus::WidescreenMode::off:
+        g_widescreen_mode = hocus::WidescreenMode::ratio_16_9;
+        break;
+    case hocus::WidescreenMode::ratio_16_9:
+        g_widescreen_mode = hocus::WidescreenMode::ratio_21_9;
+        break;
+    case hocus::WidescreenMode::ratio_21_9:
+        g_widescreen_mode = hocus::WidescreenMode::ratio_32_9;
+        break;
+    case hocus::WidescreenMode::ratio_32_9:
+        g_widescreen_mode = hocus::WidescreenMode::off;
+        break;
+    }
+}
 
 // 0BA5:4D67 indexes DS:14F8's {8,7,6} counter ticks. 1392:006A installs
 // that counter at 140 Hz. Keep the rational periods instead of rounding each
@@ -851,6 +893,8 @@ void update_title_screen(HWND window) {
         "Instructions", "Legends and hints~", "Change game options",
         "High scores",
         std::string("HIGH &FPS MODE: ") + (g_high_fps_mode ? "ON" : "OFF"),
+        std::string("&WIDESCREEN MODE: ") +
+            std::string(widescreen_mode_label()),
         "Quit - return to DOS",
     };
     options[2].push_back('~');
@@ -1275,7 +1319,7 @@ void update_auto_credits(HWND window) {
 void load_selected_level(const bool show_crystal_tip) {
     g_game = std::make_unique<hocus::GameLevel>(
         *g_archive, g_selected_level, g_campaign_score, g_skill,
-        show_crystal_tip);
+        show_crystal_tip, active_gameplay_frame_width());
     for (std::size_t index = 0; index < cheat_codes.size(); ++index) {
         g_game->set_cheat_enabled(cheat_codes[index],
                                   g_cheat_toggles[index]);
@@ -1338,7 +1382,8 @@ void start_demo(HWND window) {
     g_demo_frames = hocus::decode_demo(g_archive->read(18 + demo_index));
     g_demo_frame_index = 0;
     g_game = std::make_unique<hocus::GameLevel>(
-        *g_archive, hocus::demo_level(demo_index), 0, 1);
+        *g_archive, hocus::demo_level(demo_index), 0, 1, false,
+        active_gameplay_frame_width());
     g_dos_menu_stars.set_random_index(0);
     g_demo_playing = true;
     g_game_last_update_at = GetTickCount64();
@@ -2058,6 +2103,60 @@ std::filesystem::path native_settings_path() {
     return native_module_directory() / L"HOCUS_NATIVE.CFG";
 }
 
+void resize_window_for_frame_aspect(HWND window) {
+    if (g_fullscreen || IsZoomed(window)) {
+        return;
+    }
+    RECT client{};
+    if (!GetClientRect(window, &client)) {
+        return;
+    }
+    int client_height = client.bottom - client.top;
+    if (client_height <= 0) {
+        return;
+    }
+    const int logical_width = active_gameplay_frame_width();
+    const auto style = static_cast<DWORD>(GetWindowLongPtrW(window, GWL_STYLE));
+    const auto ex_style =
+        static_cast<DWORD>(GetWindowLongPtrW(window, GWL_EXSTYLE));
+    RECT decoration{0, 0, 0, 0};
+    if (!AdjustWindowRectEx(&decoration, style, FALSE, ex_style)) {
+        return;
+    }
+    const int decoration_width = decoration.right - decoration.left;
+    const int decoration_height = decoration.bottom - decoration.top;
+    MONITORINFO monitor_info{};
+    monitor_info.cbSize = sizeof(MONITORINFO);
+    const auto monitor = MonitorFromWindow(window, MONITOR_DEFAULTTONEAREST);
+    if (GetMonitorInfoW(monitor, &monitor_info)) {
+        const int maximum_client_width =
+            monitor_info.rcWork.right - monitor_info.rcWork.left -
+            decoration_width;
+        const int maximum_client_height =
+            monitor_info.rcWork.bottom - monitor_info.rcWork.top -
+            decoration_height;
+        client_height = std::min(client_height, maximum_client_height);
+        if (MulDiv(client_height, logical_width,
+                   hocus::game_frame_height) > maximum_client_width) {
+            client_height = MulDiv(maximum_client_width,
+                                   hocus::game_frame_height,
+                                   logical_width);
+        }
+    }
+    client_height = std::max(1, client_height);
+    RECT desired{0, 0,
+                 MulDiv(client_height, logical_width,
+                        hocus::game_frame_height),
+                 client_height};
+    if (!AdjustWindowRectEx(&desired, style, FALSE, ex_style)) {
+        return;
+    }
+    SetWindowPos(window, nullptr, 0, 0,
+                 desired.right - desired.left,
+                 desired.bottom - desired.top,
+                 SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE);
+}
+
 bool confirm_quit_application(HWND window) {
     return MessageBoxA(window, "Quit game?", "Hocus Native",
                        MB_YESNO | MB_ICONQUESTION | MB_DEFBUTTON2) == IDYES;
@@ -2091,12 +2190,20 @@ void accept_dos_menu(HWND window) {
         } else if (g_menu_selection == 7) {
             g_high_fps_mode = !g_high_fps_mode;
             hocus::write_native_settings(
-                g_native_settings_path, {g_high_fps_mode});
+                g_native_settings_path,
+                {g_high_fps_mode, g_widescreen_mode});
+            update_title_screen(window);
+        } else if (g_menu_selection == 8) {
+            advance_widescreen_mode();
+            hocus::write_native_settings(
+                g_native_settings_path,
+                {g_high_fps_mode, g_widescreen_mode});
+            resize_window_for_frame_aspect(window);
             update_title_screen(window);
         } else {
             // The original group-zero selection seven dispatches directly to
-            // 0548:08B2. The native high-FPS toggle is inserted before it,
-            // leaving Quit as the final entry.
+            // 0548:08B2. The two native presentation toggles are inserted
+            // before it, leaving Quit as the final entry.
             DestroyWindow(window);
         }
         return;
@@ -3460,8 +3567,10 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR command_line,
         g_save_file = std::make_unique<hocus::SaveFile>(
             hocus::SaveFile::load_or_default(g_save_path));
         g_native_settings_path = native_settings_path();
-        g_high_fps_mode = hocus::load_native_settings(
-            g_native_settings_path).high_fps_mode;
+        const auto native_settings = hocus::load_native_settings(
+            g_native_settings_path);
+        g_high_fps_mode = native_settings.high_fps_mode;
+        g_widescreen_mode = native_settings.widescreen_mode;
         apply_dos_settings();
         load_sound_effects();
         rebuild_sound_playback_waves();
@@ -3534,9 +3643,23 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR command_line,
         return 1;
     }
 
-    // A 2x logical window fits on 800x600-era and constrained remote desktops.
-    // The previous 3x default could be clipped by the work area, hiding the HUD.
-    RECT desired{0, 0, 640, 400};
+    // Prefer a 2x logical window, but scale ultrawide modes down when needed
+    // so the complete client area remains inside the desktop work area.
+    int initial_client_height = hocus::game_frame_height * 2;
+    RECT work_area{};
+    if (SystemParametersInfoW(SPI_GETWORKAREA, 0, &work_area, 0)) {
+        const int maximum_width = work_area.right - work_area.left - 32;
+        if (MulDiv(initial_client_height, active_gameplay_frame_width(),
+                   hocus::game_frame_height) > maximum_width) {
+            initial_client_height = MulDiv(
+                maximum_width, hocus::game_frame_height,
+                active_gameplay_frame_width());
+        }
+    }
+    RECT desired{0, 0,
+                 MulDiv(initial_client_height, active_gameplay_frame_width(),
+                        hocus::game_frame_height),
+                 initial_client_height};
     AdjustWindowRect(&desired, WS_OVERLAPPEDWINDOW, FALSE);
     HWND window = CreateWindowExW(
         0, class_name,

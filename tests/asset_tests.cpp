@@ -29,13 +29,23 @@ int main(int argc, char** argv) {
             ("hocus-native-settings-" + std::to_string(
                 std::chrono::steady_clock::now().time_since_epoch().count()) +
              ".cfg");
-        hocus::write_native_settings(settings_probe, {true});
-        if (!hocus::load_native_settings(settings_probe).high_fps_mode) {
-            std::cerr << "native high-FPS setting did not round-trip\n";
+        hocus::write_native_settings(
+            settings_probe,
+            {true, hocus::WidescreenMode::ratio_32_9});
+        const auto native_settings_round_trip =
+            hocus::load_native_settings(settings_probe);
+        if (!native_settings_round_trip.high_fps_mode ||
+            native_settings_round_trip.widescreen_mode !=
+                hocus::WidescreenMode::ratio_32_9) {
+            std::cerr << "native presentation settings did not round-trip\n";
             return 1;
         }
         std::filesystem::remove(settings_probe);
-        if (hocus::load_native_settings(settings_probe).high_fps_mode) {
+        const auto default_native_settings =
+            hocus::load_native_settings(settings_probe);
+        if (default_native_settings.high_fps_mode ||
+            default_native_settings.widescreen_mode !=
+                hocus::WidescreenMode::off) {
             std::cerr << "missing native settings did not use defaults\n";
             return 1;
         }
@@ -528,6 +538,12 @@ int main(int argc, char** argv) {
         const auto accelerated_menu = hocus::render_dos_menu(
             menu_logo, bottom, menu_cursor, font, palette,
             accelerated_menu_lines, false, 1, 0);
+        const std::vector<std::string> widescreen_menu_lines = {
+            "HIGH &FPS MODE: OFF", "&WIDESCREEN MODE: OFF",
+        };
+        const auto widescreen_menu = hocus::render_dos_menu(
+            menu_logo, bottom, menu_cursor, font, palette,
+            widescreen_menu_lines, false, 1, 0);
         const std::array<std::string, 9> slot_names = {
             "Hocus", "", "Two", "Three", "Four",
             "Five", "Six", "Seven", "Eight",
@@ -632,6 +648,18 @@ int main(int argc, char** argv) {
                 }
             }
         }
+        bool widescreen_w_is_silver = false;
+        const int widescreen_y = widescreen_menu.item_y[1];
+        for (int row = 0; row < 8; ++row) {
+            for (int column = 0; column < 8; ++column) {
+                if (widescreen_menu.image.pixels[
+                        static_cast<std::size_t>(widescreen_y + row) * 320 +
+                        widescreen_menu.text_x + column] ==
+                    palette[0xD8 + row]) {
+                    widescreen_w_is_silver = true;
+                }
+            }
+        }
         if (story_page.lines.size() != 18 ||
             story_page.nonempty_spacing != 10 ||
             story_page.empty_spacing != 10 ||
@@ -643,9 +671,11 @@ int main(int argc, char** argv) {
             main_menu.text_x != 95 || main_menu.item_y != expected_menu_y ||
             hocus::dos_menu_shortcut_key("High scores") != 'H' ||
             hocus::dos_menu_shortcut_key("HIGH &FPS MODE: OFF") != 'F' ||
+            hocus::dos_menu_shortcut_key("&WIDESCREEN MODE: OFF") != 'W' ||
             accelerated_menu.text_x !=
                 (320 - hocus::font_text_width(font, "HIGH FPS MODE: OFF")) / 2 ||
             !high_fps_f_is_silver ||
+            !widescreen_w_is_silver ||
             !cursor_matches ||
             slot_screen.item_y != expected_slot_y || !slot_cursor_matches ||
             high_scores.width != 320 || high_scores.height != 200 ||
@@ -805,6 +835,95 @@ int main(int argc, char** argv) {
             level.image.palette[0x80] != e1_active_palette[0x80]) {
             std::cerr << "E1L1 render mismatch\n";
             return 1;
+        }
+        hocus::GameLevel widescreen_game(
+            archive, {1, 1}, 0, 0, false,
+            hocus::widescreen_frame_width);
+        widescreen_game.place_player(106, 36 * 16);
+        const auto widescreen_scene = widescreen_game.render();
+        hocus::GameLevel standard_game(archive);
+        standard_game.place_player(106, 36 * 16);
+        const auto standard_scene = standard_game.render();
+        bool centred_hud_matches = true;
+        int widened_world_pixels = 0;
+        constexpr int widescreen_ui_offset =
+            (hocus::widescreen_frame_width - hocus::original_frame_width) / 2;
+        const auto widescreen_backdrop = hocus::decode_pcx(
+            archive.read(static_cast<std::size_t>(
+                widescreen_game.backdrop_asset_index())),
+            e1_active_palette);
+        for (int y = 0; y < hocus::gameplay_viewport_height; ++y) {
+            for (int x = 0; x < hocus::widescreen_frame_width; ++x) {
+                if (x >= widescreen_ui_offset &&
+                    x < hocus::widescreen_frame_width -
+                            widescreen_ui_offset) {
+                    continue;
+                }
+                const int backdrop_x =
+                    (x - widescreen_ui_offset +
+                     hocus::original_frame_width) %
+                    hocus::original_frame_width;
+                if (widescreen_scene.image.pixels[
+                        static_cast<std::size_t>(y) *
+                            hocus::widescreen_frame_width + x] !=
+                    widescreen_backdrop.pixels[
+                        static_cast<std::size_t>(y) *
+                            hocus::original_frame_width + backdrop_x]) {
+                    ++widened_world_pixels;
+                }
+            }
+        }
+        for (int y = hocus::gameplay_viewport_height;
+             y < hocus::game_frame_height && centred_hud_matches; ++y) {
+            for (int x = 0; x < hocus::original_frame_width; ++x) {
+                const auto standard_pixel =
+                    standard_scene.image.pixels[
+                        static_cast<std::size_t>(y) *
+                            hocus::original_frame_width + x];
+                const auto widescreen_pixel =
+                    widescreen_scene.image.pixels[
+                        static_cast<std::size_t>(y) *
+                            hocus::widescreen_frame_width +
+                        x + widescreen_ui_offset];
+                if (standard_pixel != widescreen_pixel) {
+                    centred_hud_matches = false;
+                    break;
+                }
+            }
+        }
+        if (widescreen_game.viewport_width() !=
+                hocus::widescreen_frame_width ||
+            widescreen_scene.image.width != hocus::widescreen_frame_width ||
+            widescreen_scene.image.height != hocus::game_frame_height ||
+            widescreen_scene.camera_pixel_x != 672 ||
+            widescreen_scene.camera_pixel_y != 496 ||
+            !sprite_matches(widescreen_scene.image, player, 176, 80) ||
+            widened_world_pixels == 0 || !centred_hud_matches ||
+            widescreen_menu.image.width != 320) {
+            std::cerr << "widescreen gameplay render mismatch\n";
+            return 1;
+        }
+        for (const int expanded_width : {
+                 hocus::ultrawide_frame_width,
+                 hocus::super_ultrawide_frame_width}) {
+            hocus::GameLevel expanded_game(
+                archive, {1, 1}, 0, 0, false, expanded_width);
+            expanded_game.place_player(106, 36 * 16);
+            const auto expanded_scene = expanded_game.render();
+            const int horizontal_focus_half_tiles =
+                (expanded_width + 8) / 16;
+            const int expected_camera_x =
+                (106 - horizontal_focus_half_tiles) * 8;
+            const int expected_player_x = 106 * 8 - expected_camera_x;
+            if (expanded_game.viewport_width() != expanded_width ||
+                expanded_scene.image.width != expanded_width ||
+                expanded_scene.image.height != hocus::game_frame_height ||
+                expanded_scene.camera_pixel_x != expected_camera_x ||
+                !sprite_matches(expanded_scene.image, player,
+                                expected_player_x, 80)) {
+                std::cerr << "expanded aspect gameplay render mismatch\n";
+                return 1;
+            }
         }
         // 0BA5:29C5 retains camera state and advances at most one eight-pixel
         // X unit and one 16-pixel row toward the previous tick's player
@@ -1258,6 +1377,26 @@ int main(int argc, char** argv) {
         if (midair_jump.player().jump_index != 2 ||
             midair_jump.player().y_pixels != before_second_jump - 24) {
             std::cerr << "mid-air jump edge handling mismatch\n";
+            return 1;
+        }
+        // Restarting an airborne arc can bypass the registered landing sample
+        // and leave Hocus's lower half inside the floor. The native recovery
+        // is cheat-gated and chooses the nearest clear pixel above it.
+        hocus::GameLevel floor_eject(archive);
+        floor_eject.place_player(6, 58 * 16);
+        floor_eject.set_cheat_enabled(
+            hocus::CheatCode::midair_jump, true);
+        floor_eject.tick({});
+        if (floor_eject.player().y_pixels != 57 * 16 ||
+            floor_eject.player().jumping || floor_eject.player().falling) {
+            std::cerr << "mid-air jump floor eject mismatch\n";
+            return 1;
+        }
+        hocus::GameLevel registered_floor_overlap(archive);
+        registered_floor_overlap.place_player(6, 58 * 16);
+        registered_floor_overlap.tick({});
+        if (registered_floor_overlap.player().y_pixels != 58 * 16) {
+            std::cerr << "disabled floor eject altered registered path\n";
             return 1;
         }
         // The native mid-air extension must also lift the DOS jump-lifetime

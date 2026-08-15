@@ -18,8 +18,7 @@ namespace {
 constexpr int map_width = 240;
 constexpr int map_height = 60;
 constexpr int tile_size = 16;
-constexpr int viewport_width = 320;
-constexpr int viewport_height = 160;
+constexpr int viewport_height = gameplay_viewport_height;
 constexpr int player_width = 24;
 constexpr int player_height = 32;
 // The collision helpers at 0BA5:0006 and 0BA5:00D3 use only VGA byte
@@ -171,14 +170,21 @@ LevelId checked_level(LevelId level) {
 
 GameLevel::GameLevel(const DatArchive& archive, LevelId level,
                      const int initial_score, const int skill,
-                     const bool show_crystal_tip)
+                     const bool show_crystal_tip, const int viewport_width)
     : level_id_(checked_level(level)),
-      font_mask_(archive.read(0)) {                  // FONT.MSK
+      font_mask_(archive.read(0)),                   // FONT.MSK
+      viewport_width_(viewport_width) {
     if (initial_score < 0) {
         throw std::out_of_range("Hocus score cannot be negative");
     }
     if (skill < 0 || skill >= static_cast<int>(damage_by_skill.size())) {
         throw std::out_of_range("Hocus skill must be easy, moderate, or hard");
+    }
+    if (viewport_width_ != original_frame_width &&
+        viewport_width_ != widescreen_frame_width &&
+        viewport_width_ != ultrawide_frame_width &&
+        viewport_width_ != super_ultrawide_frame_width) {
+        throw std::out_of_range("Unsupported Hocus gameplay viewport width");
     }
     skill_ = skill;
     damage_amount_ = damage_by_skill[static_cast<std::size_t>(skill)];
@@ -590,8 +596,12 @@ void GameLevel::shift_visual_effects_for_camera(const int delta_x,
 void GameLevel::reset_camera() noexcept {
     const int old_x = camera_pixel_x();
     const int old_y = camera_pixel_y();
+    const int horizontal_focus_half_tiles = (viewport_width_ + 8) / 16;
+    const int maximum_camera_half_tiles =
+        (map_width * tile_size - viewport_width_ + 7) / 8;
     camera_x_half_tiles_ = std::clamp(
-        player_.x_half_tiles - 20, 0, map_width * 2 - viewport_width / 8);
+        player_.x_half_tiles - horizontal_focus_half_tiles,
+        0, maximum_camera_half_tiles);
     camera_y_rows_ = std::clamp(
         floor_div(player_.y_pixels, tile_size) - camera_focus_rows_,
         0, map_height - viewport_height / tile_size);
@@ -602,8 +612,12 @@ void GameLevel::reset_camera() noexcept {
 void GameLevel::update_camera() {
     const int old_x = camera_pixel_x();
     const int old_y = camera_pixel_y();
+    const int horizontal_focus_half_tiles = (viewport_width_ + 8) / 16;
+    const int maximum_camera_half_tiles =
+        (map_width * tile_size - viewport_width_ + 7) / 8;
     const int target_x = std::clamp(
-        player_.x_half_tiles - 20, 0, map_width * 2 - viewport_width / 8);
+        player_.x_half_tiles - horizontal_focus_half_tiles,
+        0, maximum_camera_half_tiles);
     if (camera_x_half_tiles_ < target_x) {
         ++camera_x_half_tiles_;
     } else if (camera_x_half_tiles_ > target_x) {
@@ -752,6 +766,60 @@ void GameLevel::update_vertical_motion() {
         // Original gravity advances one complete tile (0BA5:612D).
         player_.y_pixels += tile_size;
         player_.falling = !solid(collision_column, player_row + 3);
+    }
+}
+
+void GameLevel::eject_from_floor_if_needed() noexcept {
+    if (!cheat_enabled(CheatCode::midair_jump)) {
+        return;
+    }
+
+    const int collision_column = (player_.x_half_tiles + 1) / 2;
+    const int lower_half_first_row = floor_div(
+        player_.y_pixels + player_height / 2, tile_size);
+    const int bottom_row = floor_div(
+        player_.y_pixels + player_height - 1, tile_size);
+    bool lower_half_overlaps_floor = false;
+    for (int row = lower_half_first_row; row <= bottom_row; ++row) {
+        if (solid(collision_column, row)) {
+            lower_half_overlaps_floor = true;
+            break;
+        }
+    }
+    if (!lower_half_overlaps_floor) {
+        return;
+    }
+
+    const auto position_is_clear = [this, collision_column](
+                                       const int y_pixels) {
+        const int first_row = floor_div(y_pixels, tile_size);
+        const int last_row = floor_div(
+            y_pixels + player_height - 1, tile_size);
+        for (int row = first_row; row <= last_row; ++row) {
+            if (solid(collision_column, row)) {
+                return false;
+            }
+        }
+        return true;
+    };
+
+    // A restarted normal/super jump moves at most sixteen pixels per update.
+    // Forty-eight pixels covers the complete player height plus that maximum
+    // penetration without turning the recovery into an arbitrary level warp.
+    constexpr int maximum_floor_eject_pixels = player_height + tile_size;
+    const int minimum_y = std::max(
+        0, player_.y_pixels - maximum_floor_eject_pixels);
+    for (int candidate_y = player_.y_pixels - 1;
+         candidate_y >= minimum_y; --candidate_y) {
+        if (!position_is_clear(candidate_y)) {
+            continue;
+        }
+        player_.y_pixels = candidate_y;
+        player_.jumping = false;
+        player_.falling = false;
+        player_.jump_index = 0;
+        player_.super_jump = false;
+        return;
     }
 }
 
@@ -1682,7 +1750,7 @@ void GameLevel::update_enemy_projectiles() {
 
         const bool outside_view =
             projectile.x_pixels < camera_x - 40 ||
-            projectile.x_pixels > camera_x + viewport_width ||
+            projectile.x_pixels > camera_x + viewport_width_ ||
             projectile.y_pixels < camera_y - 20 ||
             projectile.y_pixels > camera_y + viewport_height;
         const bool terrain_collision = solid(
@@ -2753,7 +2821,8 @@ void GameLevel::update_projectiles() {
             const int moved_screen_x = projectile.x_pixels - camera_x;
             const int moved_screen_y = projectile.y_pixels - camera_y;
             collision = moved_screen_x < -bullet_cell_width ||
-                        moved_screen_x > 319 || moved_screen_y < 0 ||
+                        moved_screen_x > viewport_width_ - 1 ||
+                        moved_screen_y < 0 ||
                         moved_screen_y >= viewport_height;
         }
 
@@ -2911,6 +2980,7 @@ void GameLevel::tick(const InputState& input) {
     update_vertical_motion();
     update_horizontal_motion(input);
     update_elevator(input);
+    eject_from_floor_if_needed();
     update_camera_focus(input);
     ++player_.animation_tick;
 }
@@ -2979,14 +3049,17 @@ void GameLevel::draw_text(DecodedImage& frame, const std::string& text,
     }
 }
 
-void GameLevel::draw_hud_values(DecodedImage& frame) const {
+void GameLevel::draw_hud_values(DecodedImage& frame,
+                                const int ui_x_offset) const {
     // 0BA5:3125 copies the ten 8x8 number cells from HUDSTUFF.IMG. Its
     // destination arguments are Mode-X byte offsets, so each byte of X is
     // four native pixels. 0BA5:348D centers the variable-width score and
     // health strings around byte columns 10 and 25 respectively.
-    const auto digit = [this, &frame](const int value, const int x, const int y) {
+    const auto digit = [this, &frame, ui_x_offset](
+                           const int value, const int x, const int y) {
         if (value >= 0 && value <= 9) {
-            blit_region(hud_stuff_, frame, value * 8, 0, 8, 8, x, y);
+            blit_region(hud_stuff_, frame, value * 8, 0, 8, 8,
+                        x + ui_x_offset, y);
         }
     };
 
@@ -3009,8 +3082,10 @@ void GameLevel::draw_hud_values(DecodedImage& frame) const {
 
     // 0BA5:3297 copies one of three 8x12 cells: silver, gold, or the empty
     // key-field background. One key is centered; two occupy separate slots.
-    const auto key_cell = [this, &frame](const int cell, const int x) {
-        blit_region(hud_stuff_, frame, 88 + cell * 8, 0, 8, 12, x, 180);
+    const auto key_cell = [this, &frame, ui_x_offset](
+                              const int cell, const int x) {
+        blit_region(hud_stuff_, frame, 88 + cell * 8, 0, 8, 12,
+                    x + ui_x_offset, 180);
     };
     key_cell(2, 212);
     key_cell(2, 220);
@@ -3025,17 +3100,19 @@ void GameLevel::draw_hud_values(DecodedImage& frame) const {
 
     if (draw_level_number_flash_ticks_ > 0 &&
         draw_level_number_flash_ticks_ < 10) {
-        blit_region(hud_stuff_, frame, 80, 0, 8, 8, 296, 182);
+        blit_region(hud_stuff_, frame, 80, 0, 8, 8,
+                    296 + ui_x_offset, 182);
     } else {
         digit(level_id_.number, 296, 182);
     }
 }
 
-void GameLevel::draw_message(DecodedImage& frame) const {
+void GameLevel::draw_message(DecodedImage& frame,
+                             const int ui_x_offset) const {
     if (crystal_tip_visible_) {
         // 0BA5:540A passes y=46 and Mode-X x-byte 12 (48 native pixels) to
         // the planar-image renderer before entering its any-input loop.
-        blit(crystal_tip_, frame, 48, 46);
+        blit(crystal_tip_, frame, 48 + ui_x_offset, 46);
         return;
     }
     if (active_message_.empty()) {
@@ -3048,7 +3125,7 @@ void GameLevel::draw_message(DecodedImage& frame) const {
     for (const auto& line : active_message_) {
         width = std::max(width, font_text_width(font_mask_, line));
     }
-    const int left = (viewport_width - width) / 2;
+    const int left = (frame.width - width) / 2;
     const int top = 80 - static_cast<int>(active_message_.size()) * 12;
     for (std::size_t line = 0; line < active_message_.size(); ++line) {
         const int y = top + static_cast<int>(line) * 12;
@@ -3149,12 +3226,14 @@ void GameLevel::draw_enemy_projectiles(DecodedImage& frame,
 
 void GameLevel::draw_enemies(DecodedImage& frame, const int camera_x,
                              const int camera_y,
-                             const double interpolation) const {
+                             const double interpolation,
+                             const int ui_x_offset) const {
     // 0BA5:0C5B converts current/original health to 78 VGA byte-columns and
     // paints three scanlines at (4,152). Each byte-column is four native
     // pixels because all VGA planes are enabled. Generic enemies call it
     // above 20 health; the two boss controllers call it unconditionally.
-    const auto draw_health_bar = [this, &frame](const EnemyState& enemy) {
+    const auto draw_health_bar = [this, &frame, ui_x_offset](
+                                     const EnemyState& enemy) {
         const int columns = std::clamp(
             static_cast<int>((static_cast<long long>(enemy.health) * 78) /
                              enemy.max_health), 0, 78);
@@ -3166,7 +3245,7 @@ void GameLevel::draw_enemies(DecodedImage& frame, const int camera_x,
             }
             for (int y = 152; y < 155; ++y) {
                 for (int plane = 0; plane < 4; ++plane) {
-                    const int x = 4 + column * 4 + plane;
+                    const int x = ui_x_offset + 4 + column * 4 + plane;
                     frame.pixels[static_cast<std::size_t>(y) * frame.width + x] =
                         hud_.palette[palette_index];
                 }
@@ -3252,7 +3331,7 @@ void GameLevel::draw_visual_effects(DecodedImage& frame) const {
         }
         for (const auto& particle : burst.particles) {
             if (particle.draw_x_pixels < 0 ||
-                particle.draw_x_pixels >= viewport_width ||
+                particle.draw_x_pixels >= viewport_width_ ||
                 particle.draw_y_pixels < 0 ||
                 particle.draw_y_pixels >= viewport_height ||
                 particle.colour_index >= hud_.palette.size()) {
@@ -3285,7 +3364,8 @@ void GameLevel::draw_visual_effects(DecodedImage& frame) const {
     }
     for (const auto& trail : spell_trails_) {
         if (!trail.visible || trail.draw_x_pixels < 0 ||
-            trail.draw_x_pixels >= viewport_width || trail.draw_y_pixels < 0 ||
+            trail.draw_x_pixels >= viewport_width_ ||
+            trail.draw_y_pixels < 0 ||
             trail.draw_y_pixels >= viewport_height) {
             continue;
         }
@@ -3312,7 +3392,7 @@ void GameLevel::draw_layer(const std::vector<std::uint8_t>& layer,
         if (map_y < 0 || map_y >= map_height) {
             continue;
         }
-        for (int sx = 0; sx < viewport_width / tile_size + 2; ++sx) {
+        for (int sx = 0; sx < viewport_width_ / tile_size + 2; ++sx) {
             const int map_x = first_column + sx;
             if (map_x < 0 || map_x >= map_width) {
                 continue;
@@ -3347,13 +3427,37 @@ LevelScene GameLevel::render(const double interpolation) const {
     const int camera_x = lerp(previous_camera_x_pixels_, camera_pixel_x());
     const int camera_y = lerp(previous_camera_y_pixels_, camera_pixel_y());
 
-    auto frame = backdrop_;
+    const int ui_x_offset = (viewport_width_ - original_frame_width) / 2;
+    DecodedImage frame;
+    if (viewport_width_ == original_frame_width) {
+        // Keep the registered path as the original image copy so the default
+        // 320x200 raster remains byte-for-byte identical.
+        frame = backdrop_;
+    } else {
+        frame.width = viewport_width_;
+        frame.height = game_frame_height;
+        frame.palette = backdrop_.palette;
+        frame.pixels.resize(static_cast<std::size_t>(frame.width) *
+                            frame.height);
+        // BACKxx.PCX is a screen-fixed 320-pixel backdrop. Repeat it into the
+        // two native side extensions while aligning the original image under
+        // the centred 320-pixel HUD region.
+        for (int y = 0; y < frame.height; ++y) {
+            for (int x = 0; x < frame.width; ++x) {
+                const int source_x =
+                    (x - ui_x_offset + backdrop_.width) % backdrop_.width;
+                frame.pixels[static_cast<std::size_t>(y) * frame.width + x] =
+                    backdrop_.pixels[static_cast<std::size_t>(y) *
+                                         backdrop_.width + source_x];
+            }
+        }
+    }
     if (crystal_flash_ticks_ > 0) {
         // 0BA5:4DC9 calls 220F instead of presenting the two map layers. The
         // player, entities, and effects are drawn afterward on the flash page.
         const auto colour = hud_.palette[static_cast<std::size_t>(
             0x77 - crystal_flash_ticks_)];
-        std::fill_n(frame.pixels.begin(), viewport_width * viewport_height,
+        std::fill_n(frame.pixels.begin(), viewport_width_ * viewport_height,
                     colour);
     } else {
         draw_layer(draw_background_layer_, frame, camera_x, camera_y);
@@ -3384,12 +3488,22 @@ LevelScene GameLevel::render(const double interpolation) const {
     // These routines execute in this order at 0BA5:547A-5492. Hocus's own
     // projectile dispatcher is later at 5806 and therefore draws last.
     draw_enemy_projectiles(frame, camera_x, camera_y, interpolation);
-    draw_enemies(frame, camera_x, camera_y, interpolation);
+    draw_enemies(frame, camera_x, camera_y, interpolation, ui_x_offset);
     draw_visual_effects(frame);
     draw_projectiles(frame, camera_x, camera_y, interpolation);
-    blit(hud_, frame, 0, viewport_height);
-    draw_hud_values(frame);
-    draw_message(frame);
+    // NEW_HUD.IMG is exactly 320 pixels wide. Repeat its stonework into the
+    // side extensions, keeping the complete original HUD centred and intact.
+    for (int y = 0; y < hud_.height; ++y) {
+        for (int x = 0; x < frame.width; ++x) {
+            const int source_x = (x - ui_x_offset + hud_.width) % hud_.width;
+            frame.pixels[static_cast<std::size_t>(viewport_height + y) *
+                             frame.width + x] =
+                hud_.pixels[static_cast<std::size_t>(y) * hud_.width +
+                            source_x];
+        }
+    }
+    draw_hud_values(frame, ui_x_offset);
+    draw_message(frame, ui_x_offset);
     return {std::move(frame), player_x, player_y, camera_x, camera_y};
 }
 

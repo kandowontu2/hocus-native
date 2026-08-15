@@ -32,9 +32,12 @@ services:
    collision, entities, scripts, and the byte-compatible save representation.
 2. `hocus_native` owns the Windows window, event pump, presentation, input, audio,
    timing, filesystem paths, and packaging.
-3. Rendering retains an indexed 320x200 logical framebuffer so palette effects,
-   pixel placement, and original timing can be reproduced. Win32 presentation
-   converts/scales the logical image rather than emulating VGA hardware.
+3. The registered path retains an indexed 320x200 logical framebuffer so
+   palette effects, pixel placement, and original timing can be reproduced.
+   Optional native widescreen gameplay expands the world/HUD framebuffer to
+   356x200 (16:9), 467x200 (21:9), or 711x200 (32:9), while menus and fixed
+   artwork remain 320x200. Win32 presentation converts/scales the logical
+   image rather than emulating VGA hardware.
 4. The audited archive index is a native compile-time table and the user's
    registered-v1.1 `HOCUS.DAT` is embedded as a Windows resource. The native
    runtime does not execute DOS code or read assets from the DOS files, but it

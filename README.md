@@ -26,7 +26,7 @@ E4L9.
 - [Build and run](#build-and-run)
 - [Controls](#controls)
 - [Cheat menu](#cheat-menu)
-- [High FPS and fullscreen](#high-fps-and-fullscreen)
+- [Widescreen, High FPS, and fullscreen](#widescreen-high-fps-and-fullscreen)
 - [Asset extraction](#asset-extraction)
 - [Verification and documentation](#verification-and-documentation)
 - [Credits and license](#credits-and-license)
@@ -55,6 +55,7 @@ E4L9.
 - Original VOC sound effects and MIDI music through Windows services
 - Optional joystick support
 - Borderless fullscreen with `Alt+Enter`
+- Selectable 16:9, 21:9, and 32:9 gameplay with additional world visibility
 - Optional interpolated High FPS mode
 - Static C/C++ runtime linkage—users do not need to install runtime libraries
 - `Ctrl+Alt+F1` cheat menu with persistent toggles and level select
@@ -147,12 +148,20 @@ menu.
 | `BLAKE` | Infinite silver and gold keys |
 | `QUARK` | Permanent rapid fire |
 | `BANANA` | Infinite laser shots |
-| `JUMP IN MID-AIR` | Jump again while airborne; the camera follows vertically |
+| `JUMP IN MID-AIR` | Jump again while airborne; the camera follows vertically and ejects Hocus from embedded floors |
 | `CHAPTER/STAGE SELECT` | Warp to any level from E1L1 through E4L9 |
 
 The four original typed cheat codes remain available as one-shot effects.
 
-## High FPS and fullscreen
+## Widescreen, High FPS, and fullscreen
+
+`WIDESCREEN MODE` appears on the main menu with shortcut `W`. Activating it
+cycles through `OFF`, `16:9`, `21:9`, and `32:9`. These modes use 320×200,
+356×200, 467×200, and 711×200 logical framebuffers respectively, drawing
+progressively more map, entity, and projectile space on both sides rather than
+stretching the image. Menus, startup screens, story pages, and other original
+artwork remain at their unmodified 320×200 dimensions. The setting persists in
+`HOCUS_NATIVE.CFG`.
 
 `HIGH FPS MODE` appears on the main menu with shortcut `F`. When enabled, it
 presents up to 125 interpolated frames per second while leaving the original
@@ -188,7 +197,8 @@ the extraction pipeline, and the parity ledger.
 | [Gameplay reconstruction](docs/GAMEPLAY.md) | Instruction-level gameplay evidence |
 | [Parity audit](docs/PARITY_AUDIT.md) | Function ledger, matches, and native qualifications |
 | [Laser audit](docs/LASER_AUDIT.md) | Complete laser-shot behavior audit |
-| [1.0 release notes](docs/RELEASE_NOTES_1.0.md) | Release highlights and validation |
+| [1.1 release notes](docs/RELEASE_NOTES_1.1.md) | Widescreen and floor-recovery update |
+| [1.0 release notes](docs/RELEASE_NOTES_1.0.md) | Initial release highlights and validation |
 
 ## Credits and license
 

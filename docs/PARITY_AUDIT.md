@@ -199,11 +199,17 @@ inside a bounded jump table are listed with their owning dispatcher.
 - Win32, GDI, DirectSound, MCI, and WinMM replace DOS interrupts, VGA ports,
   Sound Blaster/AdLib/GUS drivers, and game-port timing. Tests certify the
   recovered game-visible policy, not CPU-cycle, DAC, or synthesizer identity.
-- Window scaling and letterboxing are native additions around the exact
+- Window scaling and letterboxing are native additions around the default exact
   320x200 logical framebuffer. Closing the Windows title bar is likewise a
   native input outside the DOS program's input space. `Alt+Enter` toggles a
   borderless monitor-sized window, and the Win32 system-menu accelerator is
   suppressed so Alt remains available to the game's configurable controls.
+- `WIDESCREEN MODE` is an explicit native main-menu addition. It cycles through
+  OFF, 16:9 (356x200), 21:9 (467x200), and 32:9 (711x200), extends the
+  map/entity/projectile view and its camera bounds, centres the original HUD
+  within tiled side trim, and leaves all fixed front-end artwork at 320x200.
+  It defaults to OFF, so the registered framebuffer and culling path remain
+  unchanged. Its `W` accelerator and value persist in `HOCUS_NATIVE.CFG`.
 - `HIGH FPS MODE` is an explicit native main-menu addition. It presents up to
   125 interpolated frames per second for camera, Hocus, enemy, and projectile
   positions while leaving the selected original fixed-step simulation cadence,
@@ -215,8 +221,11 @@ inside a bounded jump table are listed with their owning dispatcher.
   a held key from restarting that arc every fixed update. While enabled, it
   also lifts the registered CF0C vertical-camera freeze during the jump table,
   allowing the unchanged incremental camera follower to track chained jumps
-  both upward and downward. It is disabled by default and does not alter the
-  registered jump or camera paths when off.
+  both upward and downward. A bounded post-movement recovery moves Hocus the
+  minimum distance upward when solid geometry overlaps his lower half, then
+  clears the interrupted airborne state. Both behaviors are disabled with the
+  toggle and do not alter the registered jump, collision, or camera paths when
+  off.
 - `CHAPTER/STAGE SELECT` is an explicit native cheat-menu addition. It can load
   any of the registered game's 36 levels while retaining the current campaign
   score; it is not presented as a recovered DOS code path.

@@ -12,6 +12,13 @@
 
 namespace hocus {
 
+inline constexpr int original_frame_width = 320;
+inline constexpr int widescreen_frame_width = 356;
+inline constexpr int ultrawide_frame_width = 467;
+inline constexpr int super_ultrawide_frame_width = 711;
+inline constexpr int game_frame_height = 200;
+inline constexpr int gameplay_viewport_height = 160;
+
 struct LevelId {
     int episode{1};
     int number{1};
@@ -217,7 +224,8 @@ class GameLevel {
 public:
     explicit GameLevel(const DatArchive& archive, LevelId level = {},
                        int initial_score = 0, int skill = 0,
-                       bool show_crystal_tip = false);
+                       bool show_crystal_tip = false,
+                       int viewport_width = original_frame_width);
 
     void tick(const InputState& input);
     void apply_cheat(CheatCode cheat) noexcept;
@@ -227,6 +235,9 @@ public:
     // [0,1] blend only visual positions between the preceding and current
     // simulation snapshots; game state and timing remain fixed-step.
     [[nodiscard]] LevelScene render(double interpolation = 1.0) const;
+    [[nodiscard]] int viewport_width() const noexcept {
+        return viewport_width_;
+    }
     [[nodiscard]] const PlayerState& player() const noexcept { return player_; }
     [[nodiscard]] const PlayerProgress& progress() const noexcept { return progress_; }
     [[nodiscard]] const std::vector<std::string>& active_message() const noexcept {
@@ -431,6 +442,7 @@ private:
     void update_vertical_motion();
     void update_horizontal_motion(const InputState& input);
     void update_elevator(const InputState& input);
+    void eject_from_floor_if_needed() noexcept;
     void reset_camera() noexcept;
     void update_camera();
     void update_camera_focus(const InputState& input) noexcept;
@@ -488,8 +500,8 @@ private:
                     DecodedImage& frame, int camera_x, int camera_y) const;
     void draw_text(DecodedImage& frame, const std::string& text,
                    int x, int y, std::uint32_t colour) const;
-    void draw_hud_values(DecodedImage& frame) const;
-    void draw_message(DecodedImage& frame) const;
+    void draw_hud_values(DecodedImage& frame, int ui_x_offset) const;
+    void draw_message(DecodedImage& frame, int ui_x_offset) const;
     void draw_projectiles(DecodedImage& frame, int camera_x, int camera_y,
                           double interpolation) const;
     void draw_laser_indicator(DecodedImage& frame, int camera_x,
@@ -498,7 +510,7 @@ private:
                                 int camera_x, int camera_y,
                                 double interpolation) const;
     void draw_enemies(DecodedImage& frame, int camera_x, int camera_y,
-                      double interpolation) const;
+                      double interpolation, int ui_x_offset) const;
     void draw_visual_effects(DecodedImage& frame) const;
 
     LevelId level_id_;
@@ -575,6 +587,7 @@ private:
     int damage_amount_{4};
     int camera_x_half_tiles_{};
     int camera_y_rows_{};
+    int viewport_width_{original_frame_width};
     int camera_focus_rows_{5};
     int camera_up_hold_ticks_{};
     int camera_down_hold_ticks_{};
