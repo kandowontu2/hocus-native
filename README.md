@@ -53,7 +53,8 @@ E4L9.
 
 - Native Win32 rendering and input; DOSBox is not used
 - Original VOC sound effects and MIDI music through Windows services
-- Optional joystick support
+- Native XInput support for Xbox-compatible controllers, with legacy WinMM
+  joystick fallback
 - Borderless fullscreen with `Alt+Enter`
 - Selectable 16:9, 21:9, and 32:9 gameplay with additional world visibility
 - Optional interpolated High FPS mode
@@ -136,6 +137,19 @@ existing DOS save, Hocus Native creates a one-time backup.
 Use the Arrow keys and `Enter` to navigate menus. Any key advances startup
 screens while preserving the Apogee and registered-title sequence.
 
+Enable `Joystick` under Game Options to use a controller. XInput checks all
+four Windows controller slots and needs no calibration. Legacy WinMM joysticks
+retain the original calibration screen.
+
+| XInput action | Controller input |
+|---|---|
+| Move / menu navigation | D-pad or left stick |
+| Jump / confirm | `A` |
+| Fire | `X`, `B`, or right trigger |
+| Pause | `Start` |
+| Cancel / back | `B` or `Back` |
+| Scroll viewport down / up | Left / right shoulder |
+
 ## Cheat menu
 
 Press `Ctrl+Alt+F1` during a level. Use Up/Down or keys `1`–`6` to select an
@@ -199,6 +213,7 @@ the extraction pipeline, and the parity ledger.
 | [Gameplay reconstruction](docs/GAMEPLAY.md) | Instruction-level gameplay evidence |
 | [Parity audit](docs/PARITY_AUDIT.md) | Function ledger, matches, and native qualifications |
 | [Laser audit](docs/LASER_AUDIT.md) | Complete laser-shot behavior audit |
+| [1.1.2 release notes](docs/RELEASE_NOTES_1.2.md) | Native XInput controller support |
 | [1.1.1 release notes](docs/RELEASE_NOTES_1.1.md) | Widescreen and floor-recovery update |
 | [1.0 release notes](docs/RELEASE_NOTES_1.0.md) | Initial release highlights and validation |
 

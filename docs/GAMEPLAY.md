@@ -87,6 +87,11 @@ The native mapping is therefore Space for jump, Ctrl for Fire, and Up for
 interaction/upward aim. The two recovered view controls default to Page Up and
 Page Down. When joystick control is enabled, gameplay uses the joystick path
 exclusively, including buttons three and four for those view controls.
+The native front end now prefers XInput across all four Windows user slots and
+falls back to this recovered WinMM path. XInput maps the D-pad/left stick to
+movement, A to jump/confirm, X/B/right trigger to Fire, Start to pause, B/Back
+to cancel, and the shoulder buttons to the two viewport controls. Its standard
+left-stick dead zone replaces DOS calibration only for that native backend.
 
 Escape enters the recovered in-game menu instead of discarding the session.
 The seven original strings map to Help, Restart, Save, Restore, Options,

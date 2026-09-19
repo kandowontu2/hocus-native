@@ -164,6 +164,51 @@ int main(int argc, char** argv) {
             std::cerr << "DOS joystick-exclusive gameplay policy mismatch\n";
             return 1;
         }
+        hocus::XInputControllerSample xinput_sample;
+        xinput_sample.left_thumb_x =
+            hocus::xinput_left_thumb_deadzone + 1;
+        xinput_sample.left_thumb_y =
+            -hocus::xinput_left_thumb_deadzone - 1;
+        xinput_sample.right_trigger =
+            hocus::xinput_trigger_threshold + 1;
+        xinput_sample.buttons = hocus::xinput_a |
+                                hocus::xinput_left_shoulder |
+                                hocus::xinput_start;
+        const auto xinput_frontend =
+            hocus::xinput_frontend_joystick_sample(xinput_sample);
+        const auto xinput_gameplay = hocus::xinput_gameplay_input(
+            all_keyboard, xinput_sample, true);
+        hocus::XInputControllerSample exact_deadzone;
+        exact_deadzone.left_thumb_x = hocus::xinput_left_thumb_deadzone;
+        exact_deadzone.left_thumb_y = -hocus::xinput_left_thumb_deadzone;
+        const auto deadzone_directions = hocus::xinput_directions(
+            exact_deadzone);
+        const auto keyboard_xinput = hocus::xinput_gameplay_input(
+            all_keyboard, {}, false);
+        if (!xinput_frontend.right || !xinput_frontend.down ||
+            !xinput_frontend.button_one || !xinput_frontend.button_three ||
+            xinput_frontend.button_two || xinput_frontend.button_four ||
+            xinput_gameplay.left || !xinput_gameplay.right ||
+            xinput_gameplay.action || !xinput_gameplay.down ||
+            !xinput_gameplay.jump || !xinput_gameplay.fire ||
+            !xinput_gameplay.scroll_down || xinput_gameplay.scroll_up ||
+            deadzone_directions.left || deadzone_directions.right ||
+            deadzone_directions.up || deadzone_directions.down ||
+            !keyboard_xinput.left || !keyboard_xinput.scroll_down ||
+            !hocus::xinput_pause_pressed(hocus::xinput_start, 0) ||
+            hocus::xinput_pause_pressed(hocus::xinput_start,
+                                        hocus::xinput_start)) {
+            std::cerr << "XInput mapping/dead-zone mismatch\n";
+            return 1;
+        }
+        hocus::XInputControllerSample xinput_menu_cancel;
+        xinput_menu_cancel.buttons = hocus::xinput_b | hocus::xinput_back;
+        const auto xinput_cancel =
+            hocus::xinput_frontend_joystick_sample(xinput_menu_cancel);
+        if (!xinput_cancel.button_two || xinput_cancel.button_one) {
+            std::cerr << "XInput menu cancel mapping mismatch\n";
+            return 1;
+        }
         hocus::StartupSequence startup;
         if (startup.stage() != hocus::StartupStage::initial_fade_out ||
             startup.fade().numerator != 40 ||

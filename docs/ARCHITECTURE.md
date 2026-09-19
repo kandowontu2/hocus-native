@@ -31,7 +31,10 @@ services:
 1. `hocus_core` owns archive access, format decoding, fixed-step game state,
    collision, entities, scripts, and the byte-compatible save representation.
 2. `hocus_native` owns the Windows window, event pump, presentation, input, audio,
-   timing, filesystem paths, and packaging.
+   timing, filesystem paths, and packaging. Its controller boundary dynamically
+   loads the newest available XInput API, checks all four user slots, and falls
+   back to the recovered WinMM joystick path without adding a runtime-library
+   installation requirement.
 3. The registered path retains an indexed 320x200 logical framebuffer so
    palette effects, pixel placement, and original timing can be reproduced.
    Optional native widescreen gameplay expands the world/HUD framebuffer to
@@ -76,7 +79,10 @@ after the player confirms a save in the native menu.
 
 Volume, game speed, joystick preference/calibration, and all eight key bindings
 use the recovered registered-v1.1 fields in `HOCUS.SAV`. Native virtual-key
-codes are derived from the DOS binding indices when the save is loaded.
+codes are derived from the DOS binding indices when the save is loaded. The
+same joystick-enabled word selects native XInput when an Xbox-compatible pad is
+connected; XInput uses fixed dead zones and mappings rather than overwriting the
+legacy calibration fields.
 
 ## Known executable data (registered v1.1)
 

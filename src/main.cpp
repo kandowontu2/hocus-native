@@ -14,6 +14,7 @@
 #include <windows.h>
 #include <mmsystem.h>
 #include <dsound.h>
+#include <xinput.h>
 
 #include <algorithm>
 #include <array>
@@ -138,7 +139,13 @@ bool g_options_return_to_pause{};
 bool g_control_return_to_level{};
 bool g_sound_enabled{true};
 bool g_music_enabled{true};
+enum class JoystickBackend {
+    none,
+    xinput,
+    winmm,
+};
 bool g_joystick_enabled{};
+JoystickBackend g_joystick_backend{JoystickBackend::none};
 bool g_high_fps_mode{};
 hocus::WidescreenMode g_widescreen_mode{hocus::WidescreenMode::off};
 bool g_fullscreen{};
@@ -571,6 +578,11 @@ std::optional<std::size_t> g_music_asset;
 bool g_music_looping{};
 std::filesystem::path g_music_path;
 JOYCAPSW g_joystick_caps{};
+using XInputGetStateFunction = DWORD (WINAPI*)(DWORD, XINPUT_STATE*);
+HMODULE g_xinput_module{};
+XInputGetStateFunction g_xinput_get_state{};
+DWORD g_xinput_user_index{};
+std::uint16_t g_previous_xinput_buttons{};
 
 constexpr std::array<int, 18> dos_key_virtual_keys = {
     VK_LSHIFT, VK_RSHIFT, VK_CONTROL, VK_MENU, VK_CAPITAL, VK_SPACE,
@@ -1772,9 +1784,89 @@ void advance_startup(HWND window) {
     }
 }
 
+bool load_xinput_api() {
+    if (g_xinput_get_state != nullptr) {
+        return true;
+    }
+    constexpr std::array<const wchar_t*, 3> xinput_libraries = {
+        L"xinput1_4.dll", L"xinput1_3.dll", L"xinput9_1_0.dll",
+    };
+    for (const auto* library : xinput_libraries) {
+        const auto module = LoadLibraryW(library);
+        if (module == nullptr) {
+            continue;
+        }
+        const auto procedure = GetProcAddress(module, "XInputGetState");
+        XInputGetStateFunction get_state{};
+        static_assert(sizeof(get_state) == sizeof(procedure));
+        std::memcpy(&get_state, &procedure, sizeof(get_state));
+        if (get_state != nullptr) {
+            g_xinput_module = module;
+            g_xinput_get_state = get_state;
+            return true;
+        }
+        FreeLibrary(module);
+    }
+    return false;
+}
+
+bool select_xinput_controller(XINPUT_STATE* initial_state = nullptr) {
+    if (!load_xinput_api()) {
+        return false;
+    }
+    for (DWORD index = 0; index < XUSER_MAX_COUNT; ++index) {
+        XINPUT_STATE state{};
+        if (g_xinput_get_state(index, &state) != ERROR_SUCCESS) {
+            continue;
+        }
+        g_xinput_user_index = index;
+        g_joystick_backend = JoystickBackend::xinput;
+        g_previous_xinput_buttons = state.Gamepad.wButtons;
+        if (initial_state != nullptr) {
+            *initial_state = state;
+        }
+        return true;
+    }
+    return false;
+}
+
+hocus::XInputControllerSample xinput_sample(const XINPUT_STATE& state) {
+    return {
+        state.Gamepad.sThumbLX,
+        state.Gamepad.sThumbLY,
+        state.Gamepad.bRightTrigger,
+        state.Gamepad.wButtons,
+    };
+}
+
+std::optional<hocus::XInputControllerSample> read_xinput_controller_sample() {
+    if (!g_joystick_enabled ||
+        g_joystick_backend != JoystickBackend::xinput ||
+        g_xinput_get_state == nullptr) {
+        return std::nullopt;
+    }
+    XINPUT_STATE state{};
+    if (g_xinput_get_state(g_xinput_user_index, &state) == ERROR_SUCCESS ||
+        select_xinput_controller(&state)) {
+        return xinput_sample(state);
+    }
+    g_joystick_enabled = false;
+    g_joystick_backend = JoystickBackend::none;
+    g_previous_xinput_buttons = 0;
+    return std::nullopt;
+}
+
 bool set_joystick_enabled(const bool enabled) {
     if (!enabled) {
         g_joystick_enabled = false;
+        g_joystick_backend = JoystickBackend::none;
+        g_previous_xinput_buttons = 0;
+        g_joystick_direction_filter.reset();
+        return true;
+    }
+    if (select_xinput_controller()) {
+        g_joystick_enabled = true;
+        g_joystick_direction_filter.reset();
         return true;
     }
     JOYINFOEX state{};
@@ -1784,9 +1876,12 @@ bool set_joystick_enabled(const bool enabled) {
                        sizeof(g_joystick_caps)) != JOYERR_NOERROR ||
         joyGetPosEx(JOYSTICKID1, &state) != JOYERR_NOERROR) {
         g_joystick_enabled = false;
+        g_joystick_backend = JoystickBackend::none;
         return false;
     }
     g_joystick_enabled = true;
+    g_joystick_backend = JoystickBackend::winmm;
+    g_joystick_direction_filter.reset();
     return true;
 }
 
@@ -1798,11 +1893,21 @@ read_frontend_joystick_sample() {
     if (!g_joystick_enabled) {
         return std::nullopt;
     }
+    if (g_joystick_backend == JoystickBackend::xinput) {
+        const auto sample = read_xinput_controller_sample();
+        if (!sample) {
+            return std::nullopt;
+        }
+        g_previous_xinput_buttons = sample->buttons;
+        return g_joystick_direction_filter.filter(
+            hocus::xinput_frontend_joystick_sample(*sample));
+    }
     JOYINFOEX state{};
     state.dwSize = sizeof(state);
     state.dwFlags = JOY_RETURNX | JOY_RETURNY | JOY_RETURNBUTTONS;
     if (joyGetPosEx(JOYSTICKID1, &state) != JOYERR_NOERROR) {
         g_joystick_enabled = false;
+        g_joystick_backend = JoystickBackend::none;
         return std::nullopt;
     }
     const auto x_range = g_joystick_caps.wXmax - g_joystick_caps.wXmin;
@@ -1986,12 +2091,16 @@ void render_active_control_screen(HWND window, const bool advance_stars) {
 }
 
 void update_options_screen(HWND window) {
+    const std::string joystick_status = !g_joystick_enabled
+        ? "off"
+        : g_joystick_backend == JoystickBackend::xinput
+            ? "XInput"
+            : "on ";
     std::vector<std::string> options = {
         std::string("Sound is now ") + (g_sound_enabled ? "on " : "off"),
         std::string("Music is now ") + (g_music_enabled ? "on " : "off"),
         "Volume control",
-        std::string("Joystick is now ") +
-            (g_joystick_enabled ? "on " : "off"),
+        std::string("Joystick is now ") + joystick_status,
         "Game playing speed",
         "Define key controls",
     };
@@ -2271,6 +2380,8 @@ void accept_dos_menu(HWND window) {
                 (void)set_joystick_enabled(false);
                 update_options_screen(window);
             } else if (!set_joystick_enabled(true)) {
+                update_options_screen(window);
+            } else if (g_joystick_backend == JoystickBackend::xinput) {
                 update_options_screen(window);
             } else {
                 update_joystick_calibration_screen(window);
@@ -3103,8 +3214,14 @@ LRESULT CALLBACK window_proc(HWND window, UINT message, WPARAM wparam,
                     return 0;
                 }
                 if (wparam == 'C' && g_joystick_enabled) {
-                    g_control_return_to_level = true;
-                    update_joystick_calibration_screen(window);
+                    if (g_joystick_backend == JoystickBackend::xinput) {
+                        show_game_overlay(
+                            window, FrontendScreen::game_notice,
+                            "XInput controller needs no calibration", 80);
+                    } else {
+                        g_control_return_to_level = true;
+                        update_joystick_calibration_screen(window);
+                    }
                     return 0;
                 }
                 if (wparam == 'M') {
@@ -3312,11 +3429,29 @@ LRESULT CALLBACK window_proc(HWND window, UINT message, WPARAM wparam,
                 keyboard.scroll_down =
                     (GetAsyncKeyState(g_key_bindings[7]) & 0x8000) != 0;
                 const bool joystick_was_enabled = g_joystick_enabled;
-                const auto joystick = read_frontend_joystick_sample();
-                const auto input = hocus::dos_gameplay_input(
-                    keyboard, joystick.value_or(
-                        hocus::DosFrontendJoystickSample{}),
-                    joystick_was_enabled, g_joystick_fire_button);
+                hocus::InputState input;
+                if (g_joystick_backend == JoystickBackend::xinput) {
+                    const auto controller = read_xinput_controller_sample();
+                    const auto current_buttons = controller
+                        ? controller->buttons : 0;
+                    const bool pause_pressed = hocus::xinput_pause_pressed(
+                        current_buttons, g_previous_xinput_buttons);
+                    g_previous_xinput_buttons = current_buttons;
+                    if (pause_pressed) {
+                        PostMessageW(window, WM_KEYDOWN, VK_ESCAPE, 0);
+                        return 0;
+                    }
+                    input = hocus::xinput_gameplay_input(
+                        keyboard,
+                        controller.value_or(hocus::XInputControllerSample{}),
+                        joystick_was_enabled);
+                } else {
+                    const auto joystick = read_frontend_joystick_sample();
+                    input = hocus::dos_gameplay_input(
+                        keyboard, joystick.value_or(
+                            hocus::DosFrontendJoystickSample{}),
+                        joystick_was_enabled, g_joystick_fire_button);
+                }
                 g_game->tick(input);
                 g_dos_menu_stars.set_random_index(g_game->random_index());
                 play_pending_sounds(window);
@@ -3677,6 +3812,11 @@ int WINAPI wWinMain(HINSTANCE instance, HINSTANCE, PWSTR command_line,
     while (GetMessageW(&message, nullptr, 0, 0) > 0) {
         TranslateMessage(&message);
         DispatchMessageW(&message);
+    }
+    if (g_xinput_module != nullptr) {
+        FreeLibrary(g_xinput_module);
+        g_xinput_module = nullptr;
+        g_xinput_get_state = nullptr;
     }
     return static_cast<int>(message.wParam);
 }

@@ -92,6 +92,9 @@ The instruction-led replay found and corrected these native mismatches:
 - Configurable viewport look-up/look-down controls, joystick buttons three and
   four, joystick-exclusive gameplay bindings, and the original two-sample
   direction confirmation are recovered.
+- Native XInput support checks all four controller slots through a dynamically
+  loaded Windows API, provides fixed modern-pad mappings and dead zones, skips
+  legacy calibration, and falls back to the recovered WinMM joystick path.
 - The crystal HUD preserves the executable's first-decimal-character rule;
   values above nine are not silently clamped to nine.
 - A newly started Episode 1 campaign displays `CRYSTAL.IMG` at the recovered
