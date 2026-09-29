@@ -3,7 +3,7 @@
 **A from-scratch native Windows port of the registered v1.1 MS-DOS release of
 *Hocus Pocus*. No DOS emulator required.**
 
-[![Release](https://img.shields.io/github/v/release/kandowontu/hocus-native?label=release)](https://github.com/kandowontu/hocus-native/releases/latest)
+[![Release](https://img.shields.io/github/v/release/kandowontu2/hocus-native?label=release)](https://github.com/kandowontu2/hocus-native/releases/latest)
 [![License](https://img.shields.io/badge/source-MIT-blue.svg)](LICENSE.md)
 
 Hocus Native recreates the original game as a Win32 application while retaining

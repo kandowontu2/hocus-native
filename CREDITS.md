@@ -31,7 +31,7 @@ The original game was developed by **Moonlite Software**, published in 1994 by
 ## Hocus Native credits
 
 - Project direction, reverse-engineering, testing, and release:
-  [kandowontu](https://github.com/kandowontu)
+  [kandowontu2](https://github.com/kandowontu2)
 - Implementation and audit assistance: OpenAI Codex
 - Original game preservation and legal distribution: Apogee Entertainment,
   GOG, and Valve/Steam
